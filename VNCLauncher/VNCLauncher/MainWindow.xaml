@@ -178,6 +178,42 @@
                             <DataGridTextColumn Header="Bağlantı Adı" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
                             <DataGridTextColumn Header="IP Adresi" Binding="{Binding IpAddress}" Width="*" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Son Bağlantı" Binding="{Binding LastConnected, StringFormat='dd.MM.yyyy HH:mm'}" Width="*" IsReadOnly="True"/>
+                            <DataGridTemplateColumn Header="Favori" Width="Auto" SortMemberPath="IsFavorite">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridColumnHeaderStyle}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsFavorite, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                  HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center" 
+                                                  Click="FavoriteCheckBox_Click">
+                                            <CheckBox.Style>
+                                                <Style TargetType="CheckBox">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="CheckBox">
+                                                                <Grid Background="Transparent">
+                                                                    <TextBlock Text="☆" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="LightGray" Visibility="Visible" Name="StarUnchecked"/>
+                                                                    <TextBlock Text="★" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gold" Visibility="Collapsed" Name="StarChecked"/>
+                                                                </Grid>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsChecked" Value="True">
+                                                                        <Setter TargetName="StarUnchecked" Property="Visibility" Value="Collapsed"/>
+                                                                        <Setter TargetName="StarChecked" Property="Visibility" Value="Visible"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="Durum" Width="Auto" IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -429,6 +465,7 @@
                                     <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Bağlantı durumu kontrolü (ping ve TCP port)</TextBlock>
                                     <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Otomatik başlangıç seçeneği</TextBlock>
                                     <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Ayarlanabilir VNC bağlantı portu</TextBlock>
+                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Favori bağlantıları işaretleme ve listenin başında gösterme</TextBlock>
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,15">

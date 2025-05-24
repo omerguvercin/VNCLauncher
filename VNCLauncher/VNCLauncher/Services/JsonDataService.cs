@@ -9,21 +9,29 @@ namespace VNCLauncher.Services
 {
     public class JsonDataService
     {
+        private const string DataFolderName = "data";
         private const string AddressBookFileName = "VNC_Adresbook.json";
         private const string ConfigFileName = "VNC_Config.json";
         
-        // Adres defteri dosya yolunu al
+        private string GetDataFolderPath()
+        {
+            string appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+            string dataFolderPath = Path.Combine(appDir, DataFolderName);
+            if (!Directory.Exists(dataFolderPath))
+            {
+                Directory.CreateDirectory(dataFolderPath);
+            }
+            return dataFolderPath;
+        }
+
         public string GetAddressBookFilePath()
         {
-            string appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? string.Empty;
-            return Path.Combine(appDir, AddressBookFileName);
+            return Path.Combine(GetDataFolderPath(), AddressBookFileName);
         }
         
-        // Ayarlar dosya yolunu al
         public string GetConfigFilePath()
         {
-            string appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? string.Empty;
-            return Path.Combine(appDir, ConfigFileName);
+            return Path.Combine(GetDataFolderPath(), ConfigFileName);
         }
         
         // Adres defterini yükle

@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using VNCLauncher.Helpers;
 using VNCLauncher.Models;
 using System.Text;
+using System.Linq;
 
 namespace VNCLauncher.Views
 {
@@ -38,9 +39,13 @@ namespace VNCLauncher.Views
                 Connection = connectionToEdit;
                 _isEditMode = true;
                 Title = "Bağlantıyı Düzenle";
-                NameTextBox.Text = Connection.Name;
-                IpAddressTextBox.Text = Connection.IpAddress;
-                OriginalIpAddress = Connection.IpAddress;
+            }
+            DataContext = Connection; // DataContext'i ayarla
+            
+            // Eğer düzenleme modundaysa ve connectionToEdit null değilse, OriginalIpAddress'i ayarla
+            if (_isEditMode && connectionToEdit != null)
+            {
+                OriginalIpAddress = connectionToEdit.IpAddress;
             }
             
             // IP adresi değiştiğinde kontrolü için event handler'lar XAML'de tanımlı
@@ -279,63 +284,43 @@ namespace VNCLauncher.Views
         
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // Form doğrulama
-            if (string.IsNullOrWhiteSpace(NameTextBox.Text))
+            // DataContext kullanıldığı için NameTextBox.Text ve IpAddressTextBox.Text doğrudan Connection nesnesini günceller.
+            // FavoriteCheckBox.IsChecked da doğrudan Connection.IsFavorite'ı günceller (Mode=TwoWay sayesinde).
+
+            // İsim ve IP boş olamaz kontrolü
+            if (string.IsNullOrWhiteSpace(Connection.Name) || string.IsNullOrWhiteSpace(Connection.IpAddress))
             {
-                ErrorTextBlock.Text = "Bağlantı adı boş olamaz.";
+                ErrorTextBlock.Text = "İsim ve IP adresi boş olamaz.";
                 IpErrorTextBlock.Text = ""; // Diğer hata mesajını temizle
                 return;
             }
             
-            if (string.IsNullOrWhiteSpace(IpAddressTextBox.Text))
-            {
-                ErrorTextBlock.Text = "IP adresi boş olamaz.";
-                IpErrorTextBlock.Text = ""; // Diğer hata mesajını temizle
-                return;
-            }
-            
-            string currentIp = IpAddressTextBox.Text.Trim();
+            string currentIp = Connection.IpAddress.Trim();
             if (!IpAddressHelper.IsValidIpAddress(currentIp))
             {
-                // ErrorTextBlock.Text = "Geçersiz IPv4 adresi formatı. Örnek: 192.168.1.1"; // Bu satır kaldırıldı
+                ErrorTextBlock.Text = "Geçersiz IPv4 adresi formatı. Örnek: 192.168.1.1";
                 IpErrorTextBlock.Text = "Geçersiz IPv4 adresi formatı. Örnek: 192.168.1.1";
-                ErrorTextBlock.Text = ""; // Genel hata mesajını temizle
                 return;
             }
-            
-            currentIp = IpAddressHelper.NormalizeIpAddress(currentIp);
-            
-            bool isDuplicate = false;
-            string? currentIdToExclude = _isEditMode ? Connection.Id : null;
-            if (IpAddressHelper.IsDuplicateIp(currentIp, _existingConnections, currentIdToExclude))
-            {
-                 if (_isEditMode && OriginalIpAddress.Equals(currentIp, StringComparison.OrdinalIgnoreCase))
-                 { // Düzenleme modunda IP değişmediyse çakışma sayılmaz
-                    isDuplicate = false;
-                 }
-                 else
-                 {
-                    isDuplicate = true;
-                 }
-            }
+
+            // IP Çakışma Kontrolü
+            string? idToExclude = _isEditMode ? Connection.Id : null;
+            bool isDuplicate = _existingConnections.Any(c => c.IpAddress.Equals(currentIp, StringComparison.OrdinalIgnoreCase) && c.Id != idToExclude);
 
             if (isDuplicate)
             {
-                // ErrorTextBlock.Text = "Bu IP adresi zaten listede mevcut."; // Bu satır kaldırıldı
                 IpErrorTextBlock.Text = "Bu IP adresi zaten listede mevcut.";
                 ErrorTextBlock.Text = ""; // Genel hata mesajını temizle
                 return;
             }
             
-            Connection.Name = NameTextBox.Text.Trim();
-            Connection.IpAddress = currentIp;
-            
+            Connection.Name = Connection.Name.Trim(); // Zaten DataContext ile bağlı ama trim için kalsın.
+            Connection.IpAddress = currentIp; // Zaten DataContext ile bağlı ama trim için kalsın.
+            // Connection.IsFavorite zaten DataBinding ile güncellenmiş olmalı.
+
             ErrorTextBlock.Text = "";
             IpErrorTextBlock.Text = "";
             successMessage.Visibility = Visibility.Visible;
-            
-            // btnSave.IsEnabled = false; // XAML'de btnSave yok, doğrudan Style'daki butonlar var
-            // btnCancel.IsEnabled = false; // XAML'de btnCancel yok
             
             _closeTimer.Start();
         }

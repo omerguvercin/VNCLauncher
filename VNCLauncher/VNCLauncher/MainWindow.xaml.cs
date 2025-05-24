@@ -118,6 +118,9 @@ public partial class MainWindow : Window
             if (_connectionsView != null)
             {
                 _connectionsView.Filter = ConnectionsFilter; // Filtreleme metodunu ata
+                _connectionsView.SortDescriptions.Clear();
+                _connectionsView.SortDescriptions.Add(new SortDescription("IsFavorite", ListSortDirection.Descending));
+                _connectionsView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
             }
             dgConnections.ItemsSource = _connectionsView; 
         }
@@ -181,16 +184,18 @@ public partial class MainWindow : Window
                 IpAddress = connectionToEditInDialog.IpAddress,
                 LastConnected = connectionToEditInDialog.LastConnected,
                 IsAvailable = connectionToEditInDialog.IsAvailable,
-                CreatedDate = connectionToEditInDialog.CreatedDate
+                CreatedDate = connectionToEditInDialog.CreatedDate,
+                IsFavorite = connectionToEditInDialog.IsFavorite
             };
             var dialog = new ConnectionDialog(_connections.ToList(), connectionCopy);
             if (dialog.ShowDialog() == true)
             {
                 connectionToEditInDialog.Name = dialog.Connection.Name;
                 connectionToEditInDialog.IpAddress = dialog.Connection.IpAddress;
+                connectionToEditInDialog.IsFavorite = dialog.Connection.IsFavorite;
                 connectionToEditInDialog.IsAvailable = await _connectionCheckService.IsHostReachableAsync(connectionToEditInDialog.IpAddress);
                 await SaveConnectionsAsync();
-                await LoadConnectionsAsync();
+                _connectionsView?.Refresh();
             }
         }
         else
@@ -861,5 +866,17 @@ public partial class MainWindow : Window
     {
         _isClosing = true;
         Application.Current.Shutdown();
+    }
+
+    private async void FavoriteCheckBox_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is CheckBox checkBox && checkBox.DataContext is VncConnection connection)
+        {
+            // IsFavorite özelliği zaten data binding ile güncellenmiş olmalı.
+            // Değişiklikleri kaydet
+            await SaveConnectionsAsync();
+            // Görünümü yenilemek için sıralamayı yeniden uygula
+            _connectionsView?.Refresh(); 
+        }
     }
 }
