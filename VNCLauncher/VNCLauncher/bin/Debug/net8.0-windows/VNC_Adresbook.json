@@ -1,0 +1,26 @@
+[
+  {
+    "Id": "19b46c54-401d-4c50-8b03-df4908e45e1b",
+    "Name": "omer",
+    "IpAddress": "192.168.1.223",
+    "LastConnected": "0001-01-01T00:00:00",
+    "IsAvailable": false,
+    "CreatedDate": "2025-05-24T12:26:40.7385443+03:00"
+  },
+  {
+    "Id": "5876453d-8e24-40d3-b9a7-b2b08012019d",
+    "Name": "omer",
+    "IpAddress": "192.239.222.12",
+    "LastConnected": "0001-01-01T00:00:00",
+    "IsAvailable": false,
+    "CreatedDate": "2025-05-24T13:01:35.1338486+03:00"
+  },
+  {
+    "Id": "44505e05-621b-40db-a8e3-321ac61a072f",
+    "Name": "omer",
+    "IpAddress": "192.168.1.107",
+    "LastConnected": "0001-01-01T00:00:00",
+    "IsAvailable": true,
+    "CreatedDate": "2025-05-24T13:04:27.5396427+03:00"
+  }
+]

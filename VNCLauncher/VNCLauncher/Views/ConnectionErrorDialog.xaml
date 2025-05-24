@@ -1,0 +1,65 @@
+<Window x:Class="VNCLauncher.Views.ConnectionErrorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VNCLauncher.Views"
+        mc:Ignorable="d"
+        Title="Bağlantı Hatası" Height="220" Width="400"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="ToolWindow"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="#FFF0F0F0">
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="OkButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#2196F3"/>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="5" Background="White" Margin="15">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Başlık -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,10" VerticalAlignment="Center">
+                <Path Width="24" Height="24" Fill="#F44336" Stretch="Uniform"
+                      Data="M12,2C17.5,2 22,6.5 22,12C22,17.5 17.5,22 12,22C6.5,22 2,17.5 2,12C2,6.5 6.5,2 12,2M12,4C7.6,4 4,7.6 4,12C4,16.4 7.6,20 12,20C16.4,20 20,16.4 20,12C20,7.6 16.4,4 12,4M11,15H13V17H11V15M11,7H13V13H11V7Z" />
+                <TextBlock Text="Bağlantı Hatası" FontSize="18" FontWeight="SemiBold" Foreground="#333" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Mesaj -->
+            <TextBlock Grid.Row="1" x:Name="txtErrorMessage" TextWrapping="Wrap" Margin="25,10,25,10" FontSize="14" Foreground="#555" VerticalAlignment="Center"/>
+
+            <!-- Butonlar -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,15,15">
+                <Button Content="Tamam" Click="OkButton_Click" Style="{StaticResource OkButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window> 
