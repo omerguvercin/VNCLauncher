@@ -404,9 +404,9 @@
                             </StackPanel>
                             
                             <!-- Durum Bilgisi -->
-                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Height="60">
                                 <TextBlock x:Name="txtDependencyStatus" TextWrapping="Wrap" 
-                                          Margin="0,5" FontSize="13" Foreground="#555555"/>
+                                          Margin="0,2" FontSize="12" Foreground="#555555"/>
                             </ScrollViewer>
                             
                             <!-- İndir Butonu -->
@@ -450,22 +450,24 @@
                                 </TextBlock>
                                 
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                                    <Path Width="24" Height="24" Margin="0,0,10,0" Fill="#FF9800" 
-                                          Data="M12,17L7,12H10V8H14V12H17L12,17M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" 
+                                    <Path Width="24" Height="24" Margin="0,0,10,0" Fill="#E91E63" 
+                                          Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.91,10.59L6.5,12L11,16.5Z" 
                                           Stretch="Uniform" />
-                                    <TextBlock Text="Özellikler" FontWeight="Bold" FontSize="16" Foreground="#333333"/>
+                                    <TextBlock Text="Gereksinimler" FontWeight="Bold" FontSize="16" Foreground="#333333"/>
                                 </StackPanel>
-                                
                                 <StackPanel Margin="0,0,0,20">
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Sistem tepsisinde çalışır</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• TightVNC için adres defteri işlevi görür</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Ağdaki VNC sunucularını tarama ve adres defterine ekleme</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Tek sayfa sekmeli arayüz</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Modern ve kullanıcı dostu arabirim</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Bağlantı durumu kontrolü (ping ve TCP port)</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Otomatik başlangıç seçeneği</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Ayarlanabilir VNC bağlantı portu</TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">• Favori bağlantıları işaretleme ve listenin başında gösterme</TextBlock>
+                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">
+                                        • TightVNC Viewer (tvnviewer.exe) - 
+                                        <Hyperlink NavigateUri="https://www.tightvnc.com/download.php" RequestNavigate="Hyperlink_RequestNavigate">
+                                            https://www.tightvnc.com/download.php
+                                        </Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">
+                                        • .NET 8.0 Runtime - 
+                                        <Hyperlink NavigateUri="https://dotnet.microsoft.com/en-us/download/dotnet/8.0" RequestNavigate="Hyperlink_RequestNavigate">
+                                            https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+                                        </Hyperlink>
+                                    </TextBlock>
                                 </StackPanel>
                                 
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
@@ -489,6 +491,12 @@
                                         <Bold>Facebook:</Bold> 
                                         <Hyperlink NavigateUri="https://fb.com/iOmerG" RequestNavigate="Hyperlink_RequestNavigate">
                                             fb.com/iOmerG
+                                        </Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock TextWrapping="Wrap" Foreground="#555555" Margin="0,0,0,5">
+                                        <Bold>GitHub:</Bold> 
+                                        <Hyperlink NavigateUri="https://github.com/omerguvercin" RequestNavigate="Hyperlink_RequestNavigate">
+                                            github.com/omerguvercin
                                         </Hyperlink>
                                     </TextBlock>
                                 </StackPanel>

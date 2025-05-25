@@ -4,11 +4,14 @@ namespace VNCLauncher.Views
 {
     public partial class ConnectionErrorDialog : Window
     {
-        public ConnectionErrorDialog(string connectionName, string ipAddress)
+        public ConnectionErrorDialog(string title, string message)
         {
             InitializeComponent();
             Owner = Application.Current.MainWindow;
-            txtErrorMessage.Text = $"{connectionName} ({ipAddress}) adlı bağlantıya şu anda ulaşılamıyor.\nLütfen bağlantının durumunu kontrol edin.";
+            if (!string.IsNullOrEmpty(title))
+                txtTitle.Text = title;
+            if (!string.IsNullOrEmpty(message))
+                txtErrorMessage.Text = message;
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)

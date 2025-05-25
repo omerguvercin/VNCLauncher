@@ -80,6 +80,42 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
+        <Style x:Key="ModernCheckBox" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Margin" Value="0,10,0,5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal">
+                            <Border x:Name="Border"
+                                    Width="20" Height="20"
+                                    CornerRadius="4"
+                                    BorderBrush="#B0BEC5"
+                                    BorderThickness="2"
+                                    Background="White"
+                                    Margin="0,0,8,0">
+                                <Path x:Name="CheckMark"
+                                      Data="M4,10 L8,14 L16,6"
+                                      Stroke="#2ECC71"
+                                      StrokeThickness="2"
+                                      Visibility="Collapsed"/>
+                            </Border>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#E6F7EF"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#2ECC71"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     
     <Border BorderBrush="#DDDDDD" BorderThickness="1" Background="White" CornerRadius="8" Margin="15">
@@ -105,20 +141,22 @@
             
             <!-- Bağlantı Adı -->
             <TextBlock Grid.Row="1" Text="Bağlantı Adı:" Margin="0,0,0,5" Foreground="#333"/>
-            <TextBox Grid.Row="2" x:Name="NameTextBox" Style="{StaticResource ModernTextBox}" TabIndex="0"/>
+            <TextBox Grid.Row="2" x:Name="NameTextBox" Style="{StaticResource ModernTextBox}" TabIndex="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
             
             <!-- IP Adresi -->
             <TextBlock Grid.Row="3" Text="IP Adresi (örn: 192.168.1.10):" Margin="0,10,0,5" Foreground="#333"/>
             <TextBox Grid.Row="4" x:Name="IpAddressTextBox" Style="{StaticResource ModernTextBox}" 
                      PreviewTextInput="IpAddressTextBox_PreviewTextInput" 
                      DataObject.Pasting="IpAddressTextBox_Pasting" 
-                     TextChanged="IpAddressTextBox_TextChanged" TabIndex="1"/>
+                     TextChanged="IpAddressTextBox_TextChanged" TabIndex="1"
+                     Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Grid.Row="5" x:Name="IpErrorTextBlock" Foreground="#D32F2F" FontSize="11" Margin="0,2,0,0" TextWrapping="Wrap"/>
             
             <!-- Favori CheckBox -->
-            <CheckBox Grid.Row="6" x:Name="FavoriteCheckBox" Content="Bu bağlantıyı favorilere ekle" 
+            <CheckBox Grid.Row="6" x:Name="FavoriteCheckBox" Content="Favoriye Ekle" 
                       IsChecked="{Binding IsFavorite, Mode=TwoWay}" 
-                      Margin="0,10,0,5" VerticalAlignment="Center" TabIndex="2"/>
+                      Style="{StaticResource ModernCheckBox}"
+                      TabIndex="2"/>
             
             <!-- Başarılı Mesajı -->
             <Grid Grid.Row="7" x:Name="successMessage" Visibility="Collapsed">

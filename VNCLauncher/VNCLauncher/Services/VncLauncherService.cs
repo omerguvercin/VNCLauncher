@@ -43,13 +43,9 @@ namespace VNCLauncher.Services
 
             if (string.IsNullOrEmpty(_vncPath) || !File.Exists(_vncPath))
             {
-                // Yolu ve portu tekrar kontrol et, belki kullanıcı ayarlardan yeni değiştirdi.
-                await LoadVncPathFromSettingsAsync(); 
-                if (string.IsNullOrEmpty(_vncPath) || !File.Exists(_vncPath))
-                {
-                     MessageBox.Show("TightVNC yolu bulunamadı veya geçersiz. Lütfen ayarlardan kontrol edin.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
+                var errorDialog = new VNCLauncher.Views.ConnectionErrorDialog("VNC Hatası", "VNC bulunamadı. Lütfen Ayarlardan VNC dosya yolunu doğrulayın.");
+                errorDialog.ShowDialog();
+                return false;
             }
 
             try

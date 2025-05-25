@@ -27,7 +27,6 @@ C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLauncher.GeneratedMSB
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLauncher.AssemblyInfoInputs.cache
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLauncher.AssemblyInfo.cs
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLauncher.csproj.CoreCompileInputs.cache
-C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLauncher.sourcelink.json
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLaunc.3121BD48.Up2Date
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\VNCLauncher.dll
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\refint\VNCLauncher.dll

@@ -38,7 +38,7 @@
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="5" Background="White" Margin="15">
+    <Border CornerRadius="10" Background="White" Margin="15" BorderBrush="#F44336" BorderThickness="2">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -47,18 +47,21 @@
             </Grid.RowDefinitions>
 
             <!-- Başlık -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,10" VerticalAlignment="Center">
-                <Path Width="24" Height="24" Fill="#F44336" Stretch="Uniform"
-                      Data="M12,2C17.5,2 22,6.5 22,12C22,17.5 17.5,22 12,22C6.5,22 2,17.5 2,12C2,6.5 6.5,2 12,2M12,4C7.6,4 4,7.6 4,12C4,16.4 7.6,20 12,20C16.4,20 20,16.4 20,12C20,7.6 16.4,4 12,4M11,15H13V17H11V15M11,7H13V13H11V7Z" />
-                <TextBlock Text="Bağlantı Hatası" FontSize="18" FontWeight="SemiBold" Foreground="#333" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="25,25,25,10" VerticalAlignment="Center">
+                <Ellipse Width="36" Height="36" Fill="#F44336" VerticalAlignment="Center">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="#B71C1C" BlurRadius="8" ShadowDepth="2"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+                <TextBlock x:Name="txtTitle" Text="Bağlantı Hatası" FontWeight="Bold" FontSize="22" Foreground="#D32F2F" Margin="10,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
 
             <!-- Mesaj -->
-            <TextBlock Grid.Row="1" x:Name="txtErrorMessage" TextWrapping="Wrap" Margin="25,10,25,10" FontSize="14" Foreground="#555" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="1" x:Name="txtErrorMessage" TextWrapping="Wrap" Margin="35,10,35,10" FontSize="15" Foreground="#333" VerticalAlignment="Center" FontWeight="SemiBold"/>
 
             <!-- Butonlar -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,15,15">
-                <Button Content="Tamam" Click="OkButton_Click" Style="{StaticResource OkButtonStyle}"/>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,25,20">
+                <Button Content="Tamam" Click="OkButton_Click" Style="{StaticResource OkButtonStyle}" FontSize="15" Width="110" Height="38"/>
             </StackPanel>
         </Grid>
     </Border>

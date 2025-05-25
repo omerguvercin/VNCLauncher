@@ -1,6 +1,27 @@
 # VNC Launcher
 
-VNC Launcher, sistem tepsisinde çalışan, TightVNC için adres defteri ve hızlı bağlantı yönetimi sağlayan modern bir masaüstü uygulamasıdır.
+## Özellikler
+- Adres defteri ile kolay bağlantı yönetimi
+- Favori ekleme
+- IP adresi ve bağlantı adı validasyonu
+- TightVNC yolu ve port ayarı
+- Bağımlılık kontrolü ve modern hata bildirimleri
+- Yardım sekmesinde gereksinimler ve linkler
+
+## Kurulum
+1. TightVNC Viewer (tvnviewer.exe) kurulu olmalı
+2. .NET 8.0 Runtime yüklü olmalı
+3. Projeyi derleyip çalıştırın
+
+## Kullanım
+- Adres defterinden yeni bağlantı ekleyin
+- Bağlantı adına ve IP adresine dikkat edin (örn: 192.168.1.100)
+- Bağlantıya çift tıklayarak hızlıca bağlanın
+- Ayarlar sekmesinden TightVNC yolunu ve portu güncelleyebilirsiniz
+
+## Gereksinimler
+- TightVNC Viewer: https://www.tightvnc.com/download.php
+- .NET 8.0 Runtime: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 ## Ana Özellikler
 - Sistem tepsisinde çalışır
@@ -17,17 +38,8 @@ VNC Launcher, sistem tepsisinde çalışan, TightVNC için adres defteri ve hız
 - .NET 8.0 Runtime
 - TightVNC Viewer (örn: `C:\Program Files\TightVNC\tvnviewer.exe`)
 
-## Kurulum
-1. [Releases](https://github.com/omerguvercin/VNCLauncher/releases) sayfasından en son sürümü indirin.
-2. ZIP dosyasını istediğiniz bir klasöre çıkarın.
-3. `VNCLauncher.exe` dosyasını çalıştırın.
-4. İlk çalıştırmada, "Ayarlar" sekmesine giderek TightVNC Viewer programının yolunu ve varsayılan VNC bağlantı portunu kontrol edin, gerekirse doğru bilgileri girip kaydedin.
-
-## Kullanım
-Program başlatıldığında sistem tepsisinde simge olarak görünür. Simgeye çift tıklandığında adres defteri arayüzü açılır. Kayıtlı bağlantılara çift tıklandığında, ayarlarda belirtilen port numarası kullanılarak TightVNC Viewer ile bağlantı kurulur.
-
 ## Ayarlar
-"Ayarlar" sekmesinden TightVNC Viewer programının yolu, varsayılan VNC bağlantı portu ve uygulamanın Windows ile otomatik başlatma seçeneği ayarlanabilir. Ayarlar `VNC_Config.json` dosyasında saklanır.
+"Ayarlar" sekmesinden TightVNC Viewer programının yolu, varsayılan VNC bağlantı portunu ve uygulamanın Windows ile otomatik başlatma seçeneği ayarlanabilir. Ayarlar `VNC_Config.json` dosyasında saklanır.
 
 ## Bağlantı Yönetimi
 - Bağlantı eklemek: (+) butonuna tıklayıp bağlantı adı ve IP adresi (örn: `192.168.1.10` veya `10.0.0.5`) girerek.

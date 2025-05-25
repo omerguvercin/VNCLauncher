@@ -218,7 +218,7 @@ public partial class MainWindow : Window
                     _connections.Remove(connectionToRemove);
                     await SaveConnectionsAsync();
                     await LoadConnectionsAsync();
-                    var successDialog = new DeleteSuccessDialog(connectionToRemove.Name);
+                    var successDialog = new DeleteSuccessDialog("Silme Başarılı", $"'{connectionToRemove.Name}' bağlantısı başarıyla silindi.");
                     successDialog.Owner = this;
                     successDialog.ShowDialog();
                 }
@@ -253,12 +253,12 @@ public partial class MainWindow : Window
             // TightVNC ile bağlantı kur
             bool result = await _vncLauncherService.LaunchVncConnectionAsync(selectedConnection);
             
-            if (!result)
-            {
-                MessageBox.Show("TightVNC başlatılırken bir hata oluştu. Lütfen TightVNC yolunu kontrol edin.", 
-                              "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else
+            // if (!result)
+            // {
+            //     MessageBox.Show("TightVNC başlatılırken bir hata oluştu. Lütfen TightVNC yolunu kontrol edin.", 
+            //                   "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            // }
+            // else
             {
                 // Son bağlantı zamanını güncelle (UI)
                 selectedConnection.LastConnected = DateTime.Now;
@@ -345,9 +345,19 @@ public partial class MainWindow : Window
             
             // Bağımlılık kontrolü
             CheckDependencies();
-            
+
+            // Ek kontrol: TightVNC yolu geçerli değilse Ayarlar sekmesine yönlendir
+            if (!_vncLauncherService.IsVncPathValid(settings.VncPath))
+            {
+                MainTabControl.SelectedIndex = 2; // Ayarlar sekmesi
+            }
             // Başarılı mesajı göster
-            MessageBox.Show("Ayarlar başarıyla kaydedildi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+            {
+                var successDialog = new VNCLauncher.Views.DeleteSuccessDialog("Ayarlar Kaydedildi", "Ayarlar başarıyla kaydedildi.");
+                successDialog.Owner = this;
+                successDialog.ShowDialog();
+            }
         }
         catch (Exception ex)
         {

@@ -23,12 +23,12 @@ namespace VNCLauncher.Views
         }
         
         // Bağlantı adını mesaja ekleme
-        public DeleteSuccessDialog(string connectionName) : this()
+        public DeleteSuccessDialog(string title, string message) : this()
         {
-            if (!string.IsNullOrEmpty(connectionName))
-            {
-                txtMessage.Text = $"'{connectionName}' bağlantısı başarıyla silindi.";
-            }
+            if (!string.IsNullOrEmpty(title))
+                txtTitle.Text = title;
+            if (!string.IsNullOrEmpty(message))
+                txtMessage.Text = message;
         }
         
         // Tamam butonu tıklandığında

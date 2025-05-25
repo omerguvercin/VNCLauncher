@@ -159,6 +159,17 @@ namespace VNCLauncher.Views
             string currentText = textBox.Text;
             int caretPosition = textBox.CaretIndex;
 
+            // Segmentlerdeki baştaki sıfırları sil
+            var segments = currentText.Split('.');
+            for (int i = 0; i < segments.Length; i++)
+            {
+                if (segments[i].Length > 1 && segments[i].All(char.IsDigit))
+                {
+                    segments[i] = int.Parse(segments[i]).ToString();
+                }
+            }
+            currentText = string.Join(".", segments);
+
             StringBuilder formattedIp = new StringBuilder();
             int segmentDigitCount = 0;
             int dotCount = 0;
@@ -174,31 +185,23 @@ namespace VNCLauncher.Views
                         formattedIp.Append(c);
                         segmentDigitCount++;
                     }
-                    // Fazla girilen rakamlar (PreviewTextInput engellemeli ama yedek kontrol)
                 }
                 else if (c == '.')
                 {
-                    // PreviewTextInput geçerli noktaları kabul etti, burada sadece ekle
-                    if (dotCount < 3 && segmentDigitCount > 0) // Nokta bir rakamdan sonra gelmeli
+                    if (dotCount < 3 && segmentDigitCount > 0)
                     {
                         formattedIp.Append('.');
                         dotCount++;
                         segmentDigitCount = 0;
                     }
-                    // Geçersiz noktalar (PreviewTextInput engellemeli)
                 }
-                // Diğer karakterler yok sayılır (PreviewTextInput engellemeli)
-
-                // Segment 3 rakama ulaştıysa ve 3 noktadan az varsa otomatik nokta ekle
-                // Ancak bir sonraki karakter zaten kullanıcı tarafından girilmiş bir nokta değilse
                 if (segmentDigitCount == 3 && dotCount < 3)
                 {
                     bool addDot = true;
                     if (i + 1 < currentText.Length && currentText[i + 1] == '.')
                     {
-                        addDot = false; // Kullanıcı zaten nokta girmiş/giriyor
+                        addDot = false;
                     }
-                    
                     if (addDot)
                     {
                         formattedIp.Append('.');
@@ -207,78 +210,17 @@ namespace VNCLauncher.Views
                     }
                 }
             }
-            
-            // Sonunda gereksiz nokta varsa kaldır (örn: "123.45." gibi bir durum oluşursa)
-            // Genellikle Preview ve yukarıdaki mantık bunu engellemeli.
             string newText = formattedIp.ToString();
-            if (newText.EndsWith(".") && newText.Count(x => x == '.') > newText.Count(char.IsDigit) / 3.00 && newText.Count(char.IsDigit) % 3 != 0 && dotCount >=3 ) {
-                 // Bu sezgisel bir kontrol, eğer sonda nokta varsa ve IP tamamlanmamış gibi görünüyorsa.
-                 // Veya daha basitçe: Eğer son karakter nokta ise ve ondan önceki segment 3 rakam değilse ve 3 nokta zaten varsa.
-                 // Şimdilik bu karmaşık temizliği pas geçiyoruz, Preview ve ana döngü doğru çalışmalı.
+            if (newText.EndsWith(".") && newText.Count(x => x == '.') > newText.Count(char.IsDigit) / 3.00 && newText.Count(char.IsDigit) % 3 != 0 && dotCount >= 3)
+            {
+                // Sonda gereksiz nokta varsa kaldır
             }
-
-
             textBox.Text = newText;
-            
-            // İmleç pozisyonunu ayarla (Bu kısım karmaşık olabilir ve iyileştirme gerektirebilir)
-            // Basit bir yaklaşım: eğer metin uzadıysa ve imleç sondaysa sonda kalsın.
-            // Ya da değişikliği yansıtacak şekilde ayarla.
             try
             {
-                 // Önceki imleç pozisyonunu korumaya çalış, nokta ekleme/çıkarma durumlarını hesaba kat
-                 int newCaret = caretPosition;
-                 if (newText.Length > currentText.Length) // karakter eklendi
-                 {
-                     // Eğer imlecin hemen soluna bir nokta eklendiyse, imleci bir ileri al
-                     if (caretPosition > 0 && caretPosition <= newText.Length && 
-                         newText[caretPosition-1] == '.' && 
-                         (caretPosition-1 >= currentText.Length || currentText[caretPosition-1] != '.'))
-                     {
-                         // Otomatik nokta eklendiyse ve imleç o noktanın eklenmesinden önceki yerdeyse
-                         // Bu durum zor, çünkü caretPosition orijinal metne göre.
-                         // Şimdilik, metin uzadığında imleci orantılı olarak ayarlamaya çalışalım.
-                         // Veya en basit haliyle:
-                         if (caretPosition > 0 && currentText.Length > 0 && caretPosition <= currentText.Length) // currentText boş değilse ve caretPosition geçerliyse
-                         {
-                            char charBeforeCaretInOld = currentText[Math.Min(caretPosition, currentText.Length) -1];
-                            char charBeforeCaretInNew = newText[Math.Min(caretPosition, newText.Length) -1];
-
-                            if (newText.Length > currentText.Length && newText.EndsWith(".") && currentText.EndsWith(charBeforeCaretInOld.ToString()) && char.IsDigit(charBeforeCaretInOld) && newText.Substring(0, newText.Length-1) == currentText)
-                            {
-                                // "123" -> "123." olduysa ve imleç 3'ten sonraydı, noktanın sonrasına.
-                                 if(caretPosition == currentText.Length) newCaret = newText.Length;
-                            }
-                         }
-                     }
-                 }
-                 // Genel olarak, imleci orijinal konumuna en yakın mantıklı yere koy.
-                 // Eğer bir değişiklik olduysa, caret pozisyonu değişebilir.
-                 // Bu örnekte en güvenli yol, basitçe sona ayarlamak olabilir eğer çok karmaşıklaşırsa.
-                 // Şimdilik, çok fazla değişiklik yapmadan önceki imleç mantığını koruyalım:
-                 
-                if (newText.Length > currentText.Length && newText.EndsWith(".")) // Otomatik nokta eklendi ve imleç bu noktanın sonuna gelmeli
-                {
-                    if (caretPosition == currentText.Length && currentText.Count(char.IsDigit) % 3 == 0 && segmentDigitCount == 0) { // 123 -> 123. ise ve imleç sondaydı
-                        textBox.CaretIndex = newText.Length;
-                    } else {
-                        // Diğer durumlar için daha hassas ayar gerekebilir, şimdilik basit tutalım.
-                        // Eğer değişiklik metnin sonundaysa ve imleç oradaysa, imleci yeni sona taşı.
-                        if(caretPosition == currentText.Length) textBox.CaretIndex = newText.Length;
-                        else textBox.CaretIndex = Math.Min(caretPosition + (newText.Length - currentText.Length), newText.Length);
-
-                    }
-                }
-                else
-                {
-                    // İmleci yaklaşık olarak koru
                     textBox.CaretIndex = Math.Min(caretPosition, newText.Length);
-                }
             }
-            catch {
-                textBox.CaretIndex = newText.Length; // Hata olursa sona taşı
-            }
-
-
+            catch { textBox.CaretIndex = newText.Length; }
             _isUpdatingIpText = false;
         }
         
@@ -290,7 +232,7 @@ namespace VNCLauncher.Views
             // İsim ve IP boş olamaz kontrolü
             if (string.IsNullOrWhiteSpace(Connection.Name) || string.IsNullOrWhiteSpace(Connection.IpAddress))
             {
-                ErrorTextBlock.Text = "İsim ve IP adresi boş olamaz.";
+                ErrorTextBlock.Text = "Bağlantı Adı ve IP adresi boş olamaz!";
                 IpErrorTextBlock.Text = ""; // Diğer hata mesajını temizle
                 return;
             }
