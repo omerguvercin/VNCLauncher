@@ -23,6 +23,7 @@ namespace VNCLauncher.Services
         public async Task InitializeAsync()
         {
             await LoadVncPathFromSettingsAsync();
+            await Task.CompletedTask;
         }
         
         private async Task LoadVncPathFromSettingsAsync()
@@ -33,19 +34,19 @@ namespace VNCLauncher.Services
         }
         
         // TightVNC uygulamasını çalıştır
-        public async Task<bool> LaunchVncConnectionAsync(VncConnection connection)
+        public Task<bool> LaunchVncConnectionAsync(VncConnection connection)
         {
             if (connection == null || string.IsNullOrWhiteSpace(connection.IpAddress))
             {
                 MessageBox.Show("Bağlantı bilgileri geçersiz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
+                return Task.FromResult(false);
             }
 
             if (string.IsNullOrEmpty(_vncPath) || !File.Exists(_vncPath))
             {
                 var errorDialog = new VNCLauncher.Views.ConnectionErrorDialog("VNC Hatası", "VNC bulunamadı. Lütfen Ayarlardan VNC dosya yolunu doğrulayın.");
                 errorDialog.ShowDialog();
-                return false;
+                return Task.FromResult(false);
             }
 
             try
@@ -61,12 +62,12 @@ namespace VNCLauncher.Services
                 connection.LastConnected = DateTime.Now; // LastConnection -> LastConnected
                 // Adres defterini burada doğrudan güncellemek yerine MainWindow sorumluluğunda olmalı.
                 // Ancak son bağlantı zamanını modelde güncelledik, bu yeterli olabilir.
-                return true;
+                return Task.FromResult(true);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"TightVNC başlatılırken hata: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
+                return Task.FromResult(false);
             }
         }
         
@@ -120,4 +121,4 @@ namespace VNCLauncher.Services
             }
         }
     }
-} 
+}

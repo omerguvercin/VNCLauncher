@@ -13,4 +13,4 @@ namespace VNCLauncher.Models
         // VNC bağlantı portu
         public int VncPort { get; set; } = 5900; // Varsayılan port 5900
     }
-} 
+}

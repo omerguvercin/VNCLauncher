@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace VNCLauncher.Models
 {
@@ -34,8 +36,11 @@ namespace VNCLauncher.Models
             get => _isVncPortOpen;
             set
             {
-                _isVncPortOpen = value;
-                OnPropertyChanged(nameof(IsVncPortOpen));
+                if (_isVncPortOpen != value)
+                {
+                    _isVncPortOpen = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -44,16 +49,25 @@ namespace VNCLauncher.Models
             get => _isSelected;
             set
             {
-                _isSelected = value;
-                OnPropertyChanged(nameof(IsSelected));
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                    // Seçim değiştiğinde seçili öğe sayısını güncelle
+                    if (Application.Current?.Dispatcher != null)
+                    {
+                        var mainWindow = Application.Current.MainWindow as MainWindow;
+                        mainWindow?.UpdateSelectedCount();
+                    }
+                }
             }
         }
-
+        
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
+        
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
         }
     }
-} 
+}
