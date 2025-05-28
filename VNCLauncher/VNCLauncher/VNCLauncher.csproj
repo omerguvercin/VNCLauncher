@@ -8,7 +8,11 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>VNC.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+<<<<<<< HEAD
     <OutputPath>C:\VNC2\VNCLauncher\VNCLauncher\bin\vnc\</OutputPath>
+=======
+    <OutputPath>C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\</OutputPath>
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
   </PropertyGroup>
 
   <ItemGroup>

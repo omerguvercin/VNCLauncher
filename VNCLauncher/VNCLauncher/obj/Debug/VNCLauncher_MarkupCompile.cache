@@ -4,11 +4,20 @@
 winexe
 C#
 .cs
+<<<<<<< HEAD
 C:\vnc2\VNCLauncher\VNCLauncher\obj\Debug\
+=======
+<<<<<<<< HEAD:VNCLauncher/VNCLauncher/obj/Debug/net8.0-windows/VNCLauncher_MarkupCompile.cache
+C:\vnc\VNCLauncher\VNCLauncher\obj\Debug\net8.0-windows\
+========
+C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\
+>>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8:VNCLauncher/VNCLauncher/obj/Debug/VNCLauncher_MarkupCompile.cache
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 VNCLauncher
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WİNDOWS7_0_OR_GREATER
+<<<<<<< HEAD
 C:\vnc2\VNCLauncher\VNCLauncher\App.xaml
 62083342456
 
@@ -17,4 +26,19 @@ C:\vnc2\VNCLauncher\VNCLauncher\App.xaml
 MainWindow.xaml;Views\ConnectionDialog.xaml;Views\ConnectionErrorDialog.xaml;Views\DeleteConfirmationDialog.xaml;Views\DeleteSuccessDialog.xaml;Views\QuickConnectDialog.xaml;
 
 False
+=======
+C:\vnc\VNCLauncher\VNCLauncher\App.xaml
+62083342456
+
+<<<<<<<< HEAD:VNCLauncher/VNCLauncher/obj/Debug/net8.0-windows/VNCLauncher_MarkupCompile.cache
+19-1479912869
+2091473432849
+========
+19868177841
+209-867050213
+>>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8:VNCLauncher/VNCLauncher/obj/Debug/VNCLauncher_MarkupCompile.cache
+MainWindow.xaml;Views\ConnectionDialog.xaml;Views\ConnectionErrorDialog.xaml;Views\DeleteConfirmationDialog.xaml;Views\DeleteSuccessDialog.xaml;Views\QuickConnectDialog.xaml;
+
+True
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 

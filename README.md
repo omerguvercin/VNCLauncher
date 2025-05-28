@@ -11,7 +11,8 @@
 ## Kurulum
 1. TightVNC Viewer (tvnviewer.exe) kurulu olmalı
 2. .NET 8.0 Runtime yüklü olmalı
-3. Projeyi derleyip çalıştırın
+3. VNCInstaller'i çalıştırın ve KUR butonu ile kurulumu yapın.
+4. Masaüstündeki kısayoldan uygulamayı çalıştırın.
 
 ## Kullanım
 - Adres defterinden yeni bağlantı ekleyin

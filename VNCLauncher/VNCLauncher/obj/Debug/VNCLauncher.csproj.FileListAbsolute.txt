@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+=======
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.exe
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.deps.json
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.runtimeconfig.json
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.dll
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.pdb
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\Hardcodet.NotifyIcon.Wpf.dll
+C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\Newtonsoft.Json.dll
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.csproj.AssemblyReference.cache
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\Views\QuickConnectDialog.baml
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\MainWindow.g.cs
@@ -10,6 +20,7 @@ C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\App.g.cs
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher_MarkupCompile.cache
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher_MarkupCompile.lref
+<<<<<<< HEAD
 C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.exe
 C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.deps.json
 C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.runtimeconfig.json
@@ -17,12 +28,18 @@ C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.dll
 C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\VNCLauncher.pdb
 C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\Hardcodet.NotifyIcon.Wpf.dll
 C:\VNC\VNCLauncher\VNCLauncher\bin\Debug\VNC\Newtonsoft.Json.dll
+=======
+C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\App.baml
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\MainWindow.baml
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\Views\ConnectionDialog.baml
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\Views\ConnectionErrorDialog.baml
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\Views\DeleteConfirmationDialog.baml
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\Views\DeleteSuccessDialog.baml
+<<<<<<< HEAD
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\App.baml
+=======
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.g.resources
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.GeneratedMSBuildEditorConfig.editorconfig
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.AssemblyInfoInputs.cache
@@ -34,6 +51,7 @@ C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\refint\VNCLauncher.dll
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.pdb
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.genruntimeconfig.cache
 C:\VNC\VNCLauncher\VNCLauncher\obj\Debug\ref\VNCLauncher.dll
+<<<<<<< HEAD
 C:\vnc2\VNCLauncher\VNCLauncher\obj\Debug\VNCLauncher.csproj.AssemblyReference.cache
 C:\vnc2\VNCLauncher\VNCLauncher\obj\Debug\Views\QuickConnectDialog.baml
 C:\vnc2\VNCLauncher\VNCLauncher\obj\Debug\MainWindow.g.cs
@@ -75,3 +93,5 @@ C:\VNC2\VNCLauncher\VNCLauncher\bin\vnc\VNCLauncher.dll
 C:\VNC2\VNCLauncher\VNCLauncher\bin\vnc\VNCLauncher.pdb
 C:\VNC2\VNCLauncher\VNCLauncher\bin\vnc\Hardcodet.NotifyIcon.Wpf.dll
 C:\VNC2\VNCLauncher\VNCLauncher\bin\vnc\Newtonsoft.Json.dll
+=======
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8

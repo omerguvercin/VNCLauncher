@@ -120,4 +120,4 @@ namespace VNCLauncher.Models
             return $"{Name} ({IpAddress})";
         }
     }
-} 
+}

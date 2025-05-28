@@ -19,15 +19,13 @@ namespace VNCLauncher.Views
         private readonly List<VncConnection> _existingConnections;
         private readonly bool _isEditMode;
         private readonly DispatcherTimer _closeTimer;
-        private string OriginalIpAddress = string.Empty; // Nullable warning için başlangıç değeri atandı
-        private bool _isUpdatingIpText = false; // TextChanged reentrancy guard for IP formatting
+        private string OriginalIpAddress = string.Empty;
+        private bool _isUpdatingIpText = false;
         
-        public ConnectionDialog(List<VncConnection> existingConnections, VncConnection? connectionToEdit = null) // connectionToEdit nullable yapıldı
+        public ConnectionDialog(List<VncConnection> existingConnections, VncConnection? connectionToEdit = null)
         {
-            InitializeComponent();
             Owner = Application.Current.MainWindow;
             _existingConnections = existingConnections;
-            
             if (connectionToEdit == null)
             {
                 Connection = new VncConnection();
@@ -40,19 +38,20 @@ namespace VNCLauncher.Views
                 _isEditMode = true;
                 Title = "Bağlantıyı Düzenle";
             }
-            DataContext = Connection; // DataContext'i ayarla
-            
-            // Eğer düzenleme modundaysa ve connectionToEdit null değilse, OriginalIpAddress'i ayarla
+            DataContext = Connection;
             if (_isEditMode && connectionToEdit != null)
             {
                 OriginalIpAddress = connectionToEdit.IpAddress;
             }
+<<<<<<< HEAD
             
             // IP adresi değiştiğinde kontrolü için event handler'lar XAML'de tanımlı
             // IpAddressTextBox.TextChanged += IpAddressTextBox_TextChanged; // XAML'de yoksa eklenebilir veya XAML'den kaldırılabilir
             // IpAddressTextBox.PreviewTextInput += IpAddressTextBox_PreviewTextInput; // XAML'de tanımlı
             // DataObject.AddPastingHandler(IpAddressTextBox, IpAddressTextBox_Pasting); // XAML'de tanımlı
             
+=======
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             _closeTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _closeTimer.Tick += CloseTimer_Tick;
         }
@@ -61,7 +60,6 @@ namespace VNCLauncher.Views
         {
             _closeTimer.Stop();
             DialogResult = true;
-            // Close(); // DialogResult = true zaten kapatır
         }
         
         private void IpAddressTextBox_Pasting(object sender, DataObjectPastingEventArgs e)
@@ -95,13 +93,19 @@ namespace VNCLauncher.Views
                     e.Handled = true;
                     return;
                 }
+<<<<<<< HEAD
                 string textBeforeCaret = currentText.Substring(0, caretIndex);
                 string[] parts = textBeforeCaret.Split('.');
                 if (string.IsNullOrEmpty(parts.LastOrDefault()))
+=======
+                // Nokta girildikten sonra caret bir sağa geçsin
+                e.Handled = false;
+                Dispatcher.BeginInvoke(new Action(() =>
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                 {
-                    e.Handled = true;
-                    return;
-                }
+                    textBox.CaretIndex = caretIndex + 1;
+                }), System.Windows.Threading.DispatcherPriority.Background);
+                return;
             }
             else if (char.IsDigit(newChar[0]))
             {
@@ -157,7 +161,12 @@ namespace VNCLauncher.Views
             StringBuilder formattedIp = new StringBuilder();
             int segmentDigitCount = 0;
             int dotCount = 0;
+<<<<<<< HEAD
             int newCaretPosition = caretPosition;
+=======
+            int lastDotCaret = -1;
+
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             for (int i = 0; i < currentText.Length; i++)
             {
                 char c = currentText[i];
@@ -186,10 +195,27 @@ namespace VNCLauncher.Views
                         formattedIp.Append('.');
                         dotCount++;
                         segmentDigitCount = 0;
+<<<<<<< HEAD
                         if (i + 1 == caretPosition)
                         {
                             newCaretPosition = formattedIp.Length;
                         }
+=======
+                        lastDotCaret = formattedIp.Length; // caret için
+                    }
+                }
+                if (segmentDigitCount == 3 && dotCount < 3)
+                {
+                    bool addDot = true;
+                    if (i + 1 < currentText.Length && currentText[i + 1] == '.')
+                        addDot = false;
+                    if (addDot)
+                    {
+                        formattedIp.Append('.');
+                        dotCount++;
+                        segmentDigitCount = 0;
+                        lastDotCaret = formattedIp.Length; // caret için
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                     }
                 }
             }
@@ -197,7 +223,19 @@ namespace VNCLauncher.Views
             textBox.Text = newText;
             try
             {
+<<<<<<< HEAD
                 textBox.CaretIndex = newCaretPosition;
+=======
+                // Eğer son eklenen karakter nokta ise caret'i sağa al
+                if (e.Changes.Any(c => c.AddedLength == 1 && textBox.Text.Length > 0 && textBox.Text[textBox.CaretIndex - 1] == '.'))
+                {
+                    textBox.CaretIndex = Math.Min(textBox.CaretIndex + 1, newText.Length);
+                }
+                else
+                {
+                    textBox.CaretIndex = Math.Min(caretPosition, newText.Length);
+                }
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             }
             catch { textBox.CaretIndex = newText.Length; }
             _isUpdatingIpText = false;
@@ -205,51 +243,36 @@ namespace VNCLauncher.Views
         
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // DataContext kullanıldığı için NameTextBox.Text ve IpAddressTextBox.Text doğrudan Connection nesnesini günceller.
-            // FavoriteCheckBox.IsChecked da doğrudan Connection.IsFavorite'ı günceller (Mode=TwoWay sayesinde).
-
             // İsim ve IP boş olamaz kontrolü
             if (string.IsNullOrWhiteSpace(Connection.Name) || string.IsNullOrWhiteSpace(Connection.IpAddress))
             {
-                ErrorTextBlock.Text = "Bağlantı Adı ve IP adresi boş olamaz!";
-                IpErrorTextBlock.Text = ""; // Diğer hata mesajını temizle
+                // Hata mesajı gösterilemiyor, sadece return
                 return;
             }
-            
             string currentIp = Connection.IpAddress.Trim();
             if (!IpAddressHelper.IsValidIpAddress(currentIp))
             {
-                ErrorTextBlock.Text = "Geçersiz IPv4 adresi formatı. Örnek: 192.168.1.1";
-                IpErrorTextBlock.Text = "Geçersiz IPv4 adresi formatı. Örnek: 192.168.1.1";
+                // Hata mesajı gösterilemiyor, sadece return
                 return;
             }
-
             // IP Çakışma Kontrolü
             string? idToExclude = _isEditMode ? Connection.Id : null;
             bool isDuplicate = _existingConnections.Any(c => c.IpAddress.Equals(currentIp, StringComparison.OrdinalIgnoreCase) && c.Id != idToExclude);
-
             if (isDuplicate)
             {
-                IpErrorTextBlock.Text = "Bu IP adresi zaten listede mevcut.";
-                ErrorTextBlock.Text = ""; // Genel hata mesajını temizle
+                // Hata mesajı gösterilemiyor, sadece return
                 return;
             }
-            
             Connection.Name = Connection.Name.Trim(); // Zaten DataContext ile bağlı ama trim için kalsın.
             Connection.IpAddress = currentIp; // Zaten DataContext ile bağlı ama trim için kalsın.
-            // Connection.IsFavorite zaten DataBinding ile güncellenmiş olmalı.
-
-            ErrorTextBlock.Text = "";
-            IpErrorTextBlock.Text = "";
-            successMessage.Visibility = Visibility.Visible;
-            
+            // Connection.IsFavorite zaten güncelleniyor
+            // Hata/success mesajı gösterilemiyor
             _closeTimer.Start();
         }
         
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            // Close(); // DialogResult = false zaten kapatır
         }
         
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -265,4 +288,4 @@ namespace VNCLauncher.Views
             }
         }
     }
-} 
+}

@@ -18,4 +18,4 @@ namespace VNCLauncher.Models
         public int PortCheckTimeoutMs { get; set; } = 1000;
         public bool SkipPingScan { get; set; } = false;
     }
-} 
+}

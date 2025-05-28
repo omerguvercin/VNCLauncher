@@ -34,19 +34,27 @@ namespace VNCLauncher.Services
         }
         
         // TightVNC uygulamasını çalıştır
-        public async Task<bool> LaunchVncConnectionAsync(VncConnection connection)
+        public Task<bool> LaunchVncConnectionAsync(VncConnection connection)
         {
             if (connection == null || string.IsNullOrWhiteSpace(connection.IpAddress))
             {
                 MessageBox.Show("Bağlantı bilgileri geçersiz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+<<<<<<< HEAD
                 return await Task.FromResult(false);
+=======
+                return Task.FromResult(false);
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             }
 
             if (string.IsNullOrEmpty(_vncPath) || !File.Exists(_vncPath))
             {
                 var errorDialog = new VNCLauncher.Views.ConnectionErrorDialog("VNC Hatası", "VNC bulunamadı. Lütfen Ayarlardan VNC dosya yolunu doğrulayın.");
                 errorDialog.ShowDialog();
+<<<<<<< HEAD
                 return await Task.FromResult(false);
+=======
+                return Task.FromResult(false);
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             }
 
             try
@@ -60,12 +68,22 @@ namespace VNCLauncher.Services
                 };
                 Process.Start(startInfo);
                 connection.LastConnected = DateTime.Now; // LastConnection -> LastConnected
+<<<<<<< HEAD
                 return await Task.FromResult(true);
+=======
+                // Adres defterini burada doğrudan güncellemek yerine MainWindow sorumluluğunda olmalı.
+                // Ancak son bağlantı zamanını modelde güncelledik, bu yeterli olabilir.
+                return Task.FromResult(true);
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"TightVNC başlatılırken hata: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+<<<<<<< HEAD
                 return await Task.FromResult(false);
+=======
+                return Task.FromResult(false);
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             }
         }
         
@@ -119,4 +137,4 @@ namespace VNCLauncher.Services
             }
         }
     }
-} 
+}

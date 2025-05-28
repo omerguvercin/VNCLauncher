@@ -1,8 +1,17 @@
 ﻿
+<<<<<<< HEAD
 FC:\vnc2\VNCLauncher\VNCLauncher\App.xaml;;
 FC:\vnc2\VNCLauncher\VNCLauncher\MainWindow.xaml;;
 FC:\vnc2\VNCLauncher\VNCLauncher\Views\ConnectionDialog.xaml;;
 FC:\vnc2\VNCLauncher\VNCLauncher\Views\ConnectionErrorDialog.xaml;;
 FC:\vnc2\VNCLauncher\VNCLauncher\Views\DeleteConfirmationDialog.xaml;;
 FC:\vnc2\VNCLauncher\VNCLauncher\Views\DeleteSuccessDialog.xaml;;
+=======
+FC:\VNC\VNCLauncher\VNCLauncher\App.xaml;;
+Fc:\VNC\VNCLauncher\VNCLauncher\MainWindow.xaml;;
+Fc:\VNC\VNCLauncher\VNCLauncher\Views\ConnectionDialog.xaml;;
+Fc:\VNC\VNCLauncher\VNCLauncher\Views\ConnectionErrorDialog.xaml;;
+Fc:\VNC\VNCLauncher\VNCLauncher\Views\DeleteConfirmationDialog.xaml;;
+Fc:\VNC\VNCLauncher\VNCLauncher\Views\DeleteSuccessDialog.xaml;;
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 

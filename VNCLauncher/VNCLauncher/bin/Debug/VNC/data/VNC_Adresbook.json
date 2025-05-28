@@ -1,0 +1,13 @@
+[
+  {
+    "Id": "fd8095fe-1926-48e0-8225-e2d7c8452606",
+    "Name": "omer",
+    "IpAddress": "192.168.1.103",
+    "LastConnected": "0001-01-01T00:00:00",
+    "IsAvailable": true,
+    "CreatedDate": "2025-05-27T15:54:46.591783+03:00",
+    "IsFavorite": false,
+    "Description": "asdad\r\n",
+    "IsSelected": false
+  }
+]

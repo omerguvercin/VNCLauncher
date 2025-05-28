@@ -100,11 +100,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\VNC2\\VNCLauncher\\VNCLauncher\\VNCLauncher.csproj",
       "projectName": "VNCLauncher",
       "projectPath": "C:\\VNC2\\VNCLauncher\\VNCLauncher\\VNCLauncher.csproj",
       "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
       "outputPath": "C:\\VNC2\\VNCLauncher\\VNCLauncher\\obj\\",
+=======
+      "projectUniqueName": "C:\\vnc\\VNCLauncher\\VNCLauncher\\VNCLauncher.csproj",
+      "projectName": "VNCLauncher",
+      "projectPath": "C:\\vnc\\VNCLauncher\\VNCLauncher\\VNCLauncher.csproj",
+      "packagesPath": "C:\\Users\\root\\.nuget\\packages\\",
+      "outputPath": "C:\\vnc\\VNCLauncher\\VNCLauncher\\obj\\",
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config"

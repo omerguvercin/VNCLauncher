@@ -164,11 +164,19 @@
                         <Button x:Name="btnDelete" Style="{StaticResource DeleteButton}" Click="BtnDelete_Click" ToolTip="Seçili Bağlantıyı Sil"/>
                         <Button x:Name="btnEdit" Style="{StaticResource EditButton}" Click="BtnEdit_Click" ToolTip="Seçili Bağlantıyı Düzenle"/>
                         <TextBlock Text="Ara:" VerticalAlignment="Center" Margin="20,0,5,0" Foreground="#555"/>
+<<<<<<< HEAD
                         <TextBox x:Name="txtSearchConnections" Width="200" Style="{StaticResource ModernTextBox}" TextChanged="TxtSearchConnections_TextChanged" VerticalAlignment="Center" Margin="0,0,0,0"/>
                         <ComboBox x:Name="cmbConnectionFilter" Width="120" Height="32" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" SelectionChanged="CmbConnectionFilter_SelectionChanged">
                             <ComboBoxItem Content="Tümü" IsSelected="True"/>
                             <ComboBoxItem Content="Erişilebilenler"/>
                             <ComboBoxItem Content="Erişilemeyenler"/>
+=======
+                        <TextBox x:Name="txtSearchConnections" Width="200" Style="{StaticResource ModernTextBox}" TextChanged="TxtSearchConnections_TextChanged" VerticalAlignment="Center" Margin="0,0,0,0"/> 
+                        <ComboBox x:Name="cmbStatusFilter" Width="120" Margin="10,0,0,0" VerticalAlignment="Center" SelectionChanged="CmbStatusFilter_SelectionChanged">
+                            <ComboBoxItem Content="Tümü" IsSelected="True"/>
+                            <ComboBoxItem Content="Erişilebilir"/>
+                            <ComboBoxItem Content="Erişilemez"/>
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                         </ComboBox>
                     </StackPanel>
                     
@@ -177,9 +185,9 @@
                               Style="{StaticResource ModernDataGridStyle}"
                               ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
                               CellStyle="{StaticResource ModernDataGridCellStyle}"
-                              RowStyle="{StaticResource ModernDataGridRowStyle}"
                               MouseDoubleClick="DgConnections_MouseDoubleClick">
                         <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="Seç" Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
                             <DataGridTextColumn Header="Bağlantı Adı" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
                             <DataGridTextColumn Header="IP Adresi" Binding="{Binding IpAddress}" Width="*" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Son Bağlantı" Binding="{Binding LastConnected, StringFormat='dd.MM.yyyy HH:mm'}" Width="*" IsReadOnly="True"/>
@@ -233,10 +241,45 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
+                        
+                        <!-- Sağ Tık Menüsü -->
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Bağlan" Click="ContextMenuConnect_Click"/>
+                                <MenuItem Header="Düzenle" Click="ContextMenuEdit_Click"/>
+                                <MenuItem Header="Sil" Click="ContextMenuDelete_Click"/>
+                                <Separator/>
+                                <MenuItem Header="Kopyala IP" Click="ContextMenuCopyIp_Click"/>
+                                <MenuItem Header="Kopyala Tümü" Click="ContextMenuCopyAll_Click"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+
+                        <!-- Satır Tooltip'i -->
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow" BasedOn="{StaticResource ModernDataGridRowStyle}">
+                                <Setter Property="ToolTip">
+                                    <Setter.Value>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding IpAddress}"/>
+                                            <TextBlock Text="Son Bağlantı: {Binding LastConnected, StringFormat='dd.MM.yyyy HH:mm'}"/>
+                                            <TextBlock Text="Durum: {Binding IsAvailable, Converter={StaticResource BoolToColorConverter}}"/>
+                                        </StackPanel>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.RowStyle>
                     </DataGrid>
+
+                    <!-- Bağlantı Listesi üstüne veya altına toplu işlem butonları ekle -->
+                    <!-- Toplu işlem butonları kaldırıldı -->
                 </Grid>
             </TabItem>
             
+<<<<<<< HEAD
+=======
+            <!-- TARAMA SEKMESİ BAŞLANGICI -->
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
             <TabItem x:Name="tabScan" Header="Tarama">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
@@ -268,34 +311,71 @@
                             <TextBlock x:Name="txtScanStatus" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="11" Foreground="#555555"/>
                         </StackPanel>
                     </Border>
+<<<<<<< HEAD
                     <Border Grid.Row="1" Grid.RowSpan="2" Background="White" CornerRadius="8" BorderBrush="#DDDDDD" BorderThickness="1" Margin="0,5,0,5">
+=======
+
+                    <!-- Tarama Sonuçları -->
+                    <Border Grid.Row="1" Grid.RowSpan="2" Background="White" CornerRadius="8" 
+                            BorderBrush="#DDDDDD" BorderThickness="1" Margin="0,5,0,5">
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
+<<<<<<< HEAD
                             <Border Grid.Row="0" Background="#F8F9FA" BorderThickness="0,0,0,1" BorderBrush="#EEEEEE" Padding="10,8,10,8">
+=======
+                            
+
+                            <!-- Başlık ve Toplu İşlemler -->
+                            <Border Grid.Row="0" Background="#F8F9FA" BorderThickness="0,0,0,1" BorderBrush="#EEEEEE" 
+                                    Padding="10,8,10,8">
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
+<<<<<<< HEAD
                                     <TextBlock Grid.Column="0" Text="Bulunan Cihazlar" FontWeight="SemiBold" FontSize="14" Foreground="#333333" VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="1" x:Name="txtSelectedCount" Text="0 öğe seçildi" Margin="15,0,0,0" VerticalAlignment="Center" Foreground="#666666"/>
                                     <Button Grid.Column="2" x:Name="btnAddSelectedToAddressBook" Click="BtnAddSelectedToAddressBook_Click" Background="#2ECC71" Foreground="White" Padding="15,8" Margin="0,0,0,0" BorderThickness="0" Cursor="Hand">
+=======
+                                    
+                                    <TextBlock Grid.Column="0" Text="Bulunan Cihazlar" FontWeight="SemiBold" 
+                                               FontSize="14" Foreground="#333333" VerticalAlignment="Center"/>
+                                    
+                                    <TextBlock Grid.Column="1" x:Name="txtSelectedCount" Text="0 öğe seçildi" 
+                                               Margin="15,0,0,0" VerticalAlignment="Center" Foreground="#666666"/>
+                                    
+                                    <Button Grid.Column="2" x:Name="btnAddSelectedToAddressBook" 
+                                            Click="BtnAddSelectedToAddressBook_Click" 
+                                            Background="#2ECC71" Foreground="White"
+                                            Padding="15,8" Margin="0,0,0,0"
+                                            BorderThickness="0" Cursor="Hand">
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                                         <Button.Resources>
                                             <Style TargetType="Border">
                                                 <Setter Property="CornerRadius" Value="4"/>
                                             </Style>
                                         </Button.Resources>
                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+<<<<<<< HEAD
                                             <Path Width="14" Height="14" Margin="0,0,8,0" Fill="White" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Stretch="Uniform"/>
+=======
+                                            <Path Width="14" Height="14" Margin="0,0,8,0" Fill="White" 
+                                                  Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" 
+                                                  Stretch="Uniform"/>
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                                             <TextBlock Text="Seçilenleri Ekle" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </Grid>
                             </Border>
+<<<<<<< HEAD
                             <DataGrid Grid.Row="1" x:Name="dgScanResults" AutoGenerateColumns="False" IsReadOnly="False" SelectionMode="Extended" Style="{StaticResource ModernDataGridStyle}" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}" CellStyle="{StaticResource ModernDataGridCellStyle}" RowStyle="{StaticResource ModernDataGridRowStyle}" Margin="0" BorderThickness="0" Background="White" ContextMenu="{StaticResource ScanResultContextMenu}">
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn Width="40">
@@ -310,6 +390,20 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
+=======
+                            
+
+                            <!-- Cihaz Listesi -->
+                            <DataGrid Grid.Row="1" x:Name="dgScanResults" AutoGenerateColumns="False" 
+                                      IsReadOnly="False" SelectionMode="Extended" 
+                                      Style="{StaticResource ModernDataGridStyle}"
+                                      ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
+                                      CellStyle="{StaticResource ModernDataGridCellStyle}"
+                                      Margin="0" BorderThickness="0" Background="White"
+                                      ContextMenu="{StaticResource ScanResultContextMenu}">
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Header="Seç" Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                                     <DataGridTextColumn Header="IP Adresi" Binding="{Binding IpAddress}" Width="*">
                                         <DataGridTextColumn.ElementStyle>
                                             <Style TargetType="TextBlock">
@@ -337,6 +431,11 @@
                             </DataGrid>
                         </Grid>
                     </Border>
+<<<<<<< HEAD
+=======
+
+                    <!-- Ekle Butonu zaten üst tarafta tanımlanmış -->
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                 </Grid>
             </TabItem>
             
@@ -392,12 +491,12 @@
                             <!-- Windows Başlangıcı -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                                 <Path Width="20" Height="20" Margin="0,0,8,0" Fill="#2ECC71"
-                                      Data="M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27M12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z"
+                                      Data="M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27L12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z"
                                       Stretch="Uniform" />
                                 <CheckBox x:Name="chkStartWithWindows" Content="Windows ile birlikte başlat" 
                                           VerticalAlignment="Center" FontWeight="SemiBold" />
                             </StackPanel>
-                            
+
                             <!-- Kaydet Butonu -->
                             <Button HorizontalAlignment="Left" Margin="0,5,0,0" Padding="20,10" 
                                     Click="BtnSaveSettings_Click" Background="#2ECC71" Foreground="White" 
@@ -512,12 +611,15 @@
                                           Stretch="Uniform" />
                                     <TextBlock Text="İletişim" FontWeight="Bold" FontSize="16" Foreground="#333333"/>
                                 </StackPanel>
-                                
                                 <StackPanel Margin="0,0,0,5">
                                     <TextBlock TextWrapping="Wrap" Margin="0,0,0,10" Foreground="#555555">
                                         <Bold>Geliştirici:</Bold> omerguvercin
                                     </TextBlock>
+<<<<<<< HEAD
                                      <TextBlock TextWrapping="Wrap" Foreground="#555555">
+=======
+                                    <TextBlock TextWrapping="Wrap" Foreground="#555555" Margin="0,0,0,5">
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
                                         <Bold>Facebook:</Bold> 
                                         <Hyperlink NavigateUri="https://fb.com/iOmerG" RequestNavigate="Hyperlink_RequestNavigate">
                                             fb.com/iOmerG

@@ -8,7 +8,11 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = VNCLauncher
+<<<<<<< HEAD
 build_property.ProjectDir = C:\vnc2\VNCLauncher\VNCLauncher\
+=======
+build_property.ProjectDir = C:\VNC\VNCLauncher\VNCLauncher\
+>>>>>>> c7478286e1e510039b6d4d27e953454cea9033a8
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false
