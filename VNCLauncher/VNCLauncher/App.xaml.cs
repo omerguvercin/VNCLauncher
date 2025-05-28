@@ -1,10 +1,18 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
+using VNCLauncher.Models;
+using VNCLauncher.Helpers;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace VNCLauncher;
 
@@ -90,5 +98,57 @@ public partial class App : Application
             // Hata gösterilirken hata oluşursa sessizce devam et
         }
     }
-}
 
+    private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+    {
+        // Context menu açıldığında yapılacak işlemler
+    }
+
+    private void ContextMenuVncConnect_Click(object sender, RoutedEventArgs e)
+    {
+        if (Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.ConnectToSelectedVnc();
+        }
+    }
+
+    private void ContextMenuCopyIp_Click(object sender, RoutedEventArgs e)
+    {
+        if (Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.CopySelectedIp();
+        }
+    }
+
+    private void ContextMenuCopyHostname_Click(object sender, RoutedEventArgs e)
+    {
+        if (Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.CopySelectedHostname();
+        }
+    }
+
+    private void ContextMenuCopyAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.CopyAllSelectedInfo();
+        }
+    }
+
+    private async void ContextMenuAddToAddressBook_Click(object sender, RoutedEventArgs e)
+    {
+        if (Current.MainWindow is MainWindow mainWindow)
+        {
+            await mainWindow.AddSelectedToAddressBookAsync();
+        }
+    }
+
+    private void ContextMenuClearSelection_Click(object sender, RoutedEventArgs e)
+    {
+        if (Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.ClearSelection();
+        }
+    }
+}

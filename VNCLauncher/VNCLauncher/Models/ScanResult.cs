@@ -5,55 +5,34 @@ namespace VNCLauncher.Models
     public class ScanResult : INotifyPropertyChanged
     {
         private string _ipAddress = string.Empty;
-        private string _hostname = string.Empty;
-        private bool _isVncPortOpen;
-        private bool _isSelected;
-
         public string IpAddress
         {
             get => _ipAddress;
-            set
-            {
-                _ipAddress = value;
-                OnPropertyChanged(nameof(IpAddress));
-            }
+            set { _ipAddress = value; OnPropertyChanged(nameof(IpAddress)); }
         }
 
-        public string Hostname
+        private string? _hostname;
+        public string? Hostname
         {
             get => _hostname;
-            set
-            {
-                _hostname = value;
-                OnPropertyChanged(nameof(Hostname));
-            }
+            set { _hostname = value; OnPropertyChanged(nameof(Hostname)); }
         }
 
+        private bool _isVncPortOpen;
         public bool IsVncPortOpen
         {
             get => _isVncPortOpen;
-            set
-            {
-                _isVncPortOpen = value;
-                OnPropertyChanged(nameof(IsVncPortOpen));
-            }
+            set { _isVncPortOpen = value; OnPropertyChanged(nameof(IsVncPortOpen)); }
         }
 
+        private bool _isSelected;
         public bool IsSelected
         {
             get => _isSelected;
-            set
-            {
-                _isSelected = value;
-                OnPropertyChanged(nameof(IsSelected));
-            }
+            set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 } 

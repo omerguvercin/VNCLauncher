@@ -53,7 +53,7 @@ namespace VNCLauncher.Views
             // IpAddressTextBox.PreviewTextInput += IpAddressTextBox_PreviewTextInput; // XAML'de tanımlı
             // DataObject.AddPastingHandler(IpAddressTextBox, IpAddressTextBox_Pasting); // XAML'de tanımlı
             
-            _closeTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _closeTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _closeTimer.Tick += CloseTimer_Tick;
         }
         
@@ -85,24 +85,19 @@ namespace VNCLauncher.Views
         {
             var textBox = sender as TextBox;
             if (textBox == null) return;
-
             string currentText = textBox.Text;
             int caretIndex = textBox.CaretIndex;
             string newChar = e.Text;
-
             if (newChar == ".")
             {
-                if (caretIndex == 0 || // Nokta başta olamaz
-                    currentText.Count(c => c == '.') >= 3 || // Zaten 3 nokta var
-                    (caretIndex > 0 && currentText[caretIndex - 1] == '.')) // Bir önceki karakter zaten nokta
+                if (caretIndex == 0 || currentText.Count(c => c == '.') >= 3 || (caretIndex > 0 && currentText[caretIndex - 1] == '.'))
                 {
                     e.Handled = true;
                     return;
                 }
-                // Mevcut segmentin (bu potansiyel noktadan önceki) boş olup olmadığını kontrol et
                 string textBeforeCaret = currentText.Substring(0, caretIndex);
                 string[] parts = textBeforeCaret.Split('.');
-                if (string.IsNullOrEmpty(parts.LastOrDefault())) // Son segment boşsa (örn: "1.2..")
+                if (string.IsNullOrEmpty(parts.LastOrDefault()))
                 {
                     e.Handled = true;
                     return;
@@ -110,32 +105,26 @@ namespace VNCLauncher.Views
             }
             else if (char.IsDigit(newChar[0]))
             {
-                // Rakam giriliyorsa, mevcut segmentin uzunluğunu kontrol et
                 string segment = "";
                 int lastDotIndex = currentText.LastIndexOf('.', caretIndex - 1);
                 segment = currentText.Substring(lastDotIndex + 1, caretIndex - (lastDotIndex + 1));
-                segment = new string(segment.Where(char.IsDigit).ToArray()); // Sadece segmentteki rakamlar
-
+                segment = new string(segment.Where(char.IsDigit).ToArray());
                 if (segment.Length >= 3)
                 {
-                    e.Handled = true; // Segment zaten 3 rakam içeriyor
+                    e.Handled = true;
                     return;
                 }
-                // Toplam rakam sayısı kontrolü
                 if (currentText.Count(char.IsDigit) >= 12)
                 {
                     e.Handled = true;
                     return;
                 }
             }
-            else // Rakam veya nokta değilse
+            else
             {
                 e.Handled = true;
                 return;
             }
-
-            // Genel uzunluk kontrolü (örn: xxx.xxx.xxx.xxx -> 15 karakter)
-            // Önizleme metninin uzunluğunu kontrol et
             string prospectiveText = currentText.Insert(caretIndex, newChar);
             if (prospectiveText.Length > 15)
             {
@@ -147,7 +136,6 @@ namespace VNCLauncher.Views
         {
             if (_isUpdatingIpText)
                 return;
-
             _isUpdatingIpText = true;
             var textBox = sender as TextBox;
             if (textBox == null)
@@ -155,11 +143,8 @@ namespace VNCLauncher.Views
                 _isUpdatingIpText = false;
                 return;
             }
-
             string currentText = textBox.Text;
             int caretPosition = textBox.CaretIndex;
-
-            // Segmentlerdeki baştaki sıfırları sil
             var segments = currentText.Split('.');
             for (int i = 0; i < segments.Length; i++)
             {
@@ -169,21 +154,29 @@ namespace VNCLauncher.Views
                 }
             }
             currentText = string.Join(".", segments);
-
             StringBuilder formattedIp = new StringBuilder();
             int segmentDigitCount = 0;
             int dotCount = 0;
-
+            int newCaretPosition = caretPosition;
             for (int i = 0; i < currentText.Length; i++)
             {
                 char c = currentText[i];
-
                 if (char.IsDigit(c))
                 {
                     if (segmentDigitCount < 3)
                     {
                         formattedIp.Append(c);
                         segmentDigitCount++;
+                        if (segmentDigitCount == 3 && dotCount < 3)
+                        {
+                            formattedIp.Append('.');
+                            dotCount++;
+                            segmentDigitCount = 0;
+                            if (i + 1 == caretPosition)
+                            {
+                                newCaretPosition = formattedIp.Length;
+                            }
+                        }
                     }
                 }
                 else if (c == '.')
@@ -193,32 +186,18 @@ namespace VNCLauncher.Views
                         formattedIp.Append('.');
                         dotCount++;
                         segmentDigitCount = 0;
-                    }
-                }
-                if (segmentDigitCount == 3 && dotCount < 3)
-                {
-                    bool addDot = true;
-                    if (i + 1 < currentText.Length && currentText[i + 1] == '.')
-                    {
-                        addDot = false;
-                    }
-                    if (addDot)
-                    {
-                        formattedIp.Append('.');
-                        dotCount++;
-                        segmentDigitCount = 0; 
+                        if (i + 1 == caretPosition)
+                        {
+                            newCaretPosition = formattedIp.Length;
+                        }
                     }
                 }
             }
             string newText = formattedIp.ToString();
-            if (newText.EndsWith(".") && newText.Count(x => x == '.') > newText.Count(char.IsDigit) / 3.00 && newText.Count(char.IsDigit) % 3 != 0 && dotCount >= 3)
-            {
-                // Sonda gereksiz nokta varsa kaldır
-            }
             textBox.Text = newText;
             try
             {
-                    textBox.CaretIndex = Math.Min(caretPosition, newText.Length);
+                textBox.CaretIndex = newCaretPosition;
             }
             catch { textBox.CaretIndex = newText.Length; }
             _isUpdatingIpText = false;

@@ -153,5 +153,35 @@ namespace VNCLauncher.Services
                 // Yedekleme sırasındaki hatayı yutuyoruz
             }
         }
+
+        public async Task<List<VncConnection>> LoadConnectionsAsync()
+        {
+            try
+            {
+                if (File.Exists(GetAddressBookFilePath()))
+                {
+                    string json = await File.ReadAllTextAsync(GetAddressBookFilePath());
+                    return JsonConvert.DeserializeObject<List<VncConnection>>(json) ?? new List<VncConnection>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Bağlantılar yüklenirken hata: {ex.Message}");
+            }
+            return new List<VncConnection>();
+        }
+
+        public async Task SaveConnectionsAsync(List<VncConnection> connections)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(connections, Formatting.Indented);
+                await File.WriteAllTextAsync(GetAddressBookFilePath(), json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Bağlantılar kaydedilirken hata: {ex.Message}");
+            }
+        }
     }
 } 

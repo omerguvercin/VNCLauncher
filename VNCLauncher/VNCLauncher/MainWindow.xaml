@@ -1,4 +1,4 @@
-﻿<Window x:Class="VNCLauncher.MainWindow"
+<Window x:Class="VNCLauncher.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,7 +8,8 @@
         xmlns:helpers="clr-namespace:VNCLauncher.Helpers"
         mc:Ignorable="d"
         Title="VNC Launcher" Height="500" Width="650" WindowStartupLocation="CenterScreen"
-        Icon="VNC.ico">
+        Icon="VNC.ico"
+        KeyDown="Window_KeyDown">
     
     <Window.Resources>
         <helpers:BoolToColorConverter x:Key="BoolToColorConverter"/>
@@ -149,7 +150,7 @@
         </tb:TaskbarIcon>
         
         <!-- Tab Control -->
-        <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="10,10,10,10" VerticalAlignment="Stretch">
+        <TabControl x:Name="tabControl" Grid.Row="1" Margin="10,10,10,10" VerticalAlignment="Stretch">
             <TabItem Header="Adres Defteri">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -162,9 +163,13 @@
                         <Button x:Name="btnAdd" Style="{StaticResource AddButton}" Click="BtnAdd_Click" ToolTip="Yeni Bağlantı Ekle"/>
                         <Button x:Name="btnDelete" Style="{StaticResource DeleteButton}" Click="BtnDelete_Click" ToolTip="Seçili Bağlantıyı Sil"/>
                         <Button x:Name="btnEdit" Style="{StaticResource EditButton}" Click="BtnEdit_Click" ToolTip="Seçili Bağlantıyı Düzenle"/>
-                        
                         <TextBlock Text="Ara:" VerticalAlignment="Center" Margin="20,0,5,0" Foreground="#555"/>
-                        <TextBox x:Name="txtSearchConnections" Width="200" Style="{StaticResource ModernTextBox}" TextChanged="TxtSearchConnections_TextChanged" VerticalAlignment="Center" Margin="0,0,0,0"/> 
+                        <TextBox x:Name="txtSearchConnections" Width="200" Style="{StaticResource ModernTextBox}" TextChanged="TxtSearchConnections_TextChanged" VerticalAlignment="Center" Margin="0,0,0,0"/>
+                        <ComboBox x:Name="cmbConnectionFilter" Width="120" Height="32" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" SelectionChanged="CmbConnectionFilter_SelectionChanged">
+                            <ComboBoxItem Content="Tümü" IsSelected="True"/>
+                            <ComboBoxItem Content="Erişilebilenler"/>
+                            <ComboBoxItem Content="Erişilemeyenler"/>
+                        </ComboBox>
                     </StackPanel>
                     
                     <!-- Bağlantı Listesi -->
@@ -232,8 +237,7 @@
                 </Grid>
             </TabItem>
             
-            <!-- TARAMA SEKMESİ BAŞLANGICI -->
-            <TabItem Header="Tarama">
+            <TabItem x:Name="tabScan" Header="Tarama">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -241,10 +245,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <!-- IP Aralığı Girişi -->
-                    <Border Grid.Row="0" Background="White" CornerRadius="8" Margin="0,5,0,2" 
-                            BorderBrush="#DDDDDD" BorderThickness="1" Padding="10,5,10,5">
+                    <Border Grid.Row="0" Background="White" CornerRadius="8" Margin="0,5,0,2" BorderBrush="#DDDDDD" BorderThickness="1" Padding="10,5,10,5">
                         <StackPanel>
                             <TextBlock Text="Ağ Tarama Ayarları" FontWeight="Bold" FontSize="16" Foreground="#333333" Margin="0,0,0,5"/>
                             <Grid Margin="0,0,0,5">
@@ -254,11 +255,8 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="IP Aralığı (örn: 192.168.1.1-254):" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBox x:Name="txtIpRange" Grid.Column="1" Style="{StaticResource ModernTextBox}" Margin="0,0,0,0"
-                                         PreviewTextInput="IpRangeTextBox_PreviewTextInput" TextChanged="IpRangeTextBox_TextChanged"/>
-                                <Button x:Name="btnScanNetwork" Grid.Column="2" Content="Ağı Tara" Margin="15,0,0,0" 
-                                        Padding="15,8" Click="BtnScanNetwork_Click" 
-                                        Background="#3498DB" Foreground="White" BorderThickness="0" Cursor="Hand">
+                                <TextBox x:Name="txtIpRange" Grid.Column="1" Style="{StaticResource ModernTextBox}" Margin="0,0,0,0" PreviewTextInput="IpRangeTextBox_PreviewTextInput" TextChanged="IpRangeTextBox_TextChanged"/>
+                                <Button x:Name="btnScanNetwork" Grid.Column="2" Content="Ağı Tara" Margin="15,0,0,0" Padding="15,8" Click="BtnScanNetwork_Click" Background="#3498DB" Foreground="White" BorderThickness="0" Cursor="Hand">
                                     <Button.Resources>
                                         <Style TargetType="Border">
                                             <Setter Property="CornerRadius" Value="4"/>
@@ -270,44 +268,78 @@
                             <TextBlock x:Name="txtScanStatus" TextWrapping="Wrap" Margin="0,2,0,0" FontSize="11" Foreground="#555555"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Tarama Sonuçları -->
-                    <TextBlock Grid.Row="1" Text="Bulunan Cihazlar" FontWeight="Bold" FontSize="16" Foreground="#333333" Margin="0,2,0,2"/>
-                    <DataGrid Grid.Row="2" x:Name="dgScanResults" AutoGenerateColumns="False" 
-                              IsReadOnly="True" SelectionMode="Extended" Margin="0,0,0,5">
-                        <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="Auto">
-                                <DataGridCheckBoxColumn.Header>
-                                    <CheckBox x:Name="headerCheckBox" Checked="HeaderCheckBox_Checked" Unchecked="HeaderCheckBox_Unchecked"/>
-                                </DataGridCheckBoxColumn.Header>
-                            </DataGridCheckBoxColumn>
-                            <DataGridTextColumn Header="Hostname" Binding="{Binding Hostname}" Width="*"/>
-                            <DataGridTextColumn Header="IP Adresi" Binding="{Binding IpAddress}" Width="*"/>
-                            <DataGridTextColumn Header="VNC Portu Açık" Binding="{Binding IsVncPortOpen}" Width="Auto"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-
-                    <!-- Ekle Butonu -->
-                    <Button Grid.Row="3" x:Name="btnAddSelectedToAddressBook" 
-                            HorizontalAlignment="Right" Margin="0,5,0,0" Padding="15,8" 
-                            Click="BtnAddSelectedToAddressBook_Click" Background="#2ECC71" 
-                            Foreground="White" BorderThickness="0" Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="4"/>
-                            </Style>
-                        </Button.Resources>
-                        <StackPanel Orientation="Horizontal">
-                            <Path Width="14" Height="14" Margin="0,0,8,0" Fill="White" 
-                                  Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Stretch="Uniform"/>
-                            <TextBlock Text="Seçilenleri Ekle"/>
-                        </StackPanel>
-                    </Button>
+                    <Border Grid.Row="1" Grid.RowSpan="2" Background="White" CornerRadius="8" BorderBrush="#DDDDDD" BorderThickness="1" Margin="0,5,0,5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="#F8F9FA" BorderThickness="0,0,0,1" BorderBrush="#EEEEEE" Padding="10,8,10,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Bulunan Cihazlar" FontWeight="SemiBold" FontSize="14" Foreground="#333333" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" x:Name="txtSelectedCount" Text="0 öğe seçildi" Margin="15,0,0,0" VerticalAlignment="Center" Foreground="#666666"/>
+                                    <Button Grid.Column="2" x:Name="btnAddSelectedToAddressBook" Click="BtnAddSelectedToAddressBook_Click" Background="#2ECC71" Foreground="White" Padding="15,8" Margin="0,0,0,0" BorderThickness="0" Cursor="Hand">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="4"/>
+                                            </Style>
+                                        </Button.Resources>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Path Width="14" Height="14" Margin="0,0,8,0" Fill="White" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Stretch="Uniform"/>
+                                            <TextBlock Text="Seçilenleri Ekle" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                            <DataGrid Grid.Row="1" x:Name="dgScanResults" AutoGenerateColumns="False" IsReadOnly="False" SelectionMode="Extended" Style="{StaticResource ModernDataGridStyle}" ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}" CellStyle="{StaticResource ModernDataGridCellStyle}" RowStyle="{StaticResource ModernDataGridRowStyle}" Margin="0" BorderThickness="0" Background="White" ContextMenu="{StaticResource ScanResultContextMenu}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn.HeaderTemplate>
+                                            <DataTemplate>
+                                                <CheckBox x:Name="headerCheckBox" Checked="HeaderCheckBox_Checked" Unchecked="HeaderCheckBox_Unchecked"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.HeaderTemplate>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="IP Adresi" Binding="{Binding IpAddress}" Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="10,5"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Hostname" Binding="{Binding Hostname}" Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="10,5"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Hostname}" Value="{x:Null}">
+                                                        <Setter Property="Text" Value="Bilinmiyor"/>
+                                                        <Setter Property="FontStyle" Value="Italic"/>
+                                                        <Setter Property="Foreground" Value="#999999"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
                 </Grid>
             </TabItem>
-            <!-- TARAMA SEKMESİ BİTİŞİ -->
             
-            <!-- AYARLAR SEKMESİ BAŞLANGICI -->
             <TabItem Header="Ayarlar">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
@@ -405,8 +437,12 @@
                             
                             <!-- Durum Bilgisi -->
                             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Height="60">
-                                <TextBlock x:Name="txtDependencyStatus" TextWrapping="Wrap" 
-                                          Margin="0,2" FontSize="12" Foreground="#555555"/>
+                                <StackPanel>
+                                    <TextBlock x:Name="txtDependencyStatus" TextWrapping="Wrap" 
+                                              Margin="0,2" FontSize="12" Foreground="#555555"/>
+                                    <TextBlock x:Name="txtDotNetStatus" TextWrapping="Wrap" 
+                                              Margin="0,2" FontSize="12" Foreground="#555555"/>
+                                </StackPanel>
                             </ScrollViewer>
                             
                             <!-- İndir Butonu -->
@@ -444,9 +480,9 @@
                                 <TextBlock TextWrapping="Wrap" Margin="0,0,0,20" Foreground="#555555">
                                     <Bold>Kullanım:</Bold> Program başlatıldığında sistem tepsisinde simge olarak görünür. Simgeye çift tıklandığında adres defteri arayüzü açılır. Kayıtlı bağlantılara çift tıklandığında TightVNC Viewer ile bağlantı kurulur.
                                     <LineBreak/>
-                                    <Bold>Tarama Sekmesi:</Bold> Belirtilen IP aralığındaki VNC sunucularını bulmanızı sağlar. IP aralığını "192.168.1.1-254" veya "192.168.1.10" (tek IP) formatında girebilirsiniz. Tarama sırasında "Durdur" butonu ile işlemi iptal edebilirsiniz. Bulunan cihazlardan seçtiklerinizi "Seçilenleri Ekle" butonu ile adres defterine kaydedebilirsiniz.
-                                    <LineBreak/>
                                     <Bold>Ayarlar Sekmesi:</Bold> TightVNC Viewer programının yolu ve varsayılan VNC bağlantı portu bu sekmeden ayarlanabilir. Ayrıca, uygulamanın Windows ile birlikte başlayıp başlamayacağı da buradan kontrol edilebilir.
+                                    <LineBreak/>
+                                    <Bold>Tarama Sekmesi:</Bold> Ağ üzerindeki VNC sunucularını taramak için kullanılır. IP aralığı belirtilerek (örn: 192.168.1.1-254) tarama yapılabilir. Bulunan cihazlar listelenir ve adres defterine eklenebilir.
                                 </TextBlock>
                                 
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
@@ -457,7 +493,7 @@
                                 </StackPanel>
                                 <StackPanel Margin="0,0,0,20">
                                     <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555555">
-                                        • TightVNC Viewer (tvnviewer.exe) - 
+                                        • TightVNC Viewer - 
                                         <Hyperlink NavigateUri="https://www.tightvnc.com/download.php" RequestNavigate="Hyperlink_RequestNavigate">
                                             https://www.tightvnc.com/download.php
                                         </Hyperlink>
@@ -479,15 +515,9 @@
                                 
                                 <StackPanel Margin="0,0,0,5">
                                     <TextBlock TextWrapping="Wrap" Margin="0,0,0,10" Foreground="#555555">
-                                        <Bold>Geliştirici:</Bold> Ömer Güvercin
+                                        <Bold>Geliştirici:</Bold> omerguvercin
                                     </TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Foreground="#555555" Margin="0,0,0,5">
-                                        <Bold>Telegram:</Bold> 
-                                        <Hyperlink NavigateUri="https://t.me/iomerg" RequestNavigate="Hyperlink_RequestNavigate">
-                                            t.me/iomerg
-                                        </Hyperlink>
-                                    </TextBlock>
-                                    <TextBlock TextWrapping="Wrap" Foreground="#555555">
+                                     <TextBlock TextWrapping="Wrap" Foreground="#555555">
                                         <Bold>Facebook:</Bold> 
                                         <Hyperlink NavigateUri="https://fb.com/iOmerG" RequestNavigate="Hyperlink_RequestNavigate">
                                             fb.com/iOmerG
@@ -495,7 +525,7 @@
                                     </TextBlock>
                                     <TextBlock TextWrapping="Wrap" Foreground="#555555" Margin="0,0,0,5">
                                         <Bold>GitHub:</Bold> 
-                                        <Hyperlink NavigateUri="https://github.com/omerguvercin" RequestNavigate="Hyperlink_RequestNavigate">
+                                        <Hyperlink NavigateUri="   https://github.com/omerguvercin" RequestNavigate="Hyperlink_RequestNavigate">
                                             github.com/omerguvercin
                                         </Hyperlink>
                                     </TextBlock>

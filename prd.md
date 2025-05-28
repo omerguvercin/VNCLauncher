@@ -68,6 +68,12 @@ Sık sık farklı bilgisayarlara TightVNC ile bağlanan IT profesyonelleri, sist
 5.  Tarama tamamlandığında veya durdurulduğunda, VNC portu açık olan cihazlar listelenir.
 6.  Kullanıcı listeden adres defterine eklemek istediği cihazları seçer.
 7.  "Seçilenleri Ekle" butonuna tıklayarak bu cihazları adres defterine kaydeder.
+8.  **Yeni:** Sağ tık menüsü ile hızlı işlemler yapabilir:
+    - VNC ile doğrudan bağlan (Enter)
+    - IP adresi veya hostname kopyalama (Ctrl+Shift+I / Ctrl+Shift+H)
+    - Tüm bilgileri kopyalama (Ctrl+Shift+A)
+    - Adres defterine ekle (Ctrl+D)
+    - Seçimi kaldır (Esc)
 
 ### 4.3. Ayarların Yapılandırılması
 1.  Kullanıcı "Ayarlar" sekmesine gider.

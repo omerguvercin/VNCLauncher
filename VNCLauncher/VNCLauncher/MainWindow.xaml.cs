@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,13 +14,12 @@ using System.Diagnostics;
 using System.Windows.Navigation;
 using System.Windows.Controls;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Input;
 using System.Windows.Data;
+using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
+using System.Net.NetworkInformation;
 
 namespace VNCLauncher;
 
@@ -68,27 +67,22 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
         
         // TabControl içindeki sekme değişimini izle
-        MainTabControl.SelectionChanged += TabControl_SelectionChanged;
+        tabControl.SelectionChanged += TabControl_SelectionChanged;
 
         // LoadConnectionsAsync(); // MainWindow_Loaded içinde çağrılıyor
     }
     
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        // VNC Launcher servisini başlat ve ayarlarını yükle
-        await _vncLauncherService.InitializeAsync();
-
-        // Ayarları yükle
-        await LoadSettingsAsync();
-        
-        // Bağlantıları yükle
+        await InitializeAsync();
         await LoadConnectionsAsync();
-        
-        // Bağlantı durumlarını kontrol et
-        await CheckConnectionStatusAsync();
-        
-        // Bağımlılık kontrolü
+        await LoadSettingsAsync();
         CheckDependencies();
+    }
+    
+    private async Task InitializeAsync()
+    {
+        await _vncLauncherService.InitializeAsync();
     }
     
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
@@ -106,9 +100,9 @@ public partial class MainWindow : Window
     {
         try
         {
-            var loadedConnections = await _jsonDataService.LoadAddressBookAsync();
+            var connections = await _jsonDataService.LoadConnectionsAsync();
             _connections.Clear();
-            foreach (var connection in loadedConnections)
+            foreach (var connection in connections)
             {
                 _connections.Add(connection);
             }
@@ -132,16 +126,22 @@ public partial class MainWindow : Window
     
     private bool ConnectionsFilter(object item)
     {
-        if (string.IsNullOrEmpty(txtSearchConnections.Text))
-            return true; // Arama metni boşsa her şeyi göster
+        if (item is not VncConnection connection) return false;
+        string searchText = txtSearchConnections.Text.ToLower();
+        string filter = (cmbConnectionFilter.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Tümü";
 
-        if (item is VncConnection connection)
+        bool matchesSearch = string.IsNullOrEmpty(searchText) ||
+            connection.Name.ToLower().Contains(searchText) ||
+            connection.IpAddress.ToLower().Contains(searchText);
+
+        bool matchesFilter = filter switch
         {
-            string searchText = txtSearchConnections.Text.ToLower();
-            return connection.Name.ToLower().Contains(searchText) || 
-                   connection.IpAddress.ToLower().Contains(searchText);
-        }
-        return false;
+            "Erişilebilenler" => connection.IsAvailable,
+            "Erişilemeyenler" => !connection.IsAvailable,
+            _ => true
+        };
+
+        return matchesSearch && matchesFilter;
     }
 
     private void TxtSearchConnections_TextChanged(object sender, TextChangedEventArgs e)
@@ -278,7 +278,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            await _jsonDataService.SaveAddressBookAsync(_connections.ToList());
+            await _jsonDataService.SaveConnectionsAsync(_connections.ToList());
         }
         catch (Exception ex)
         {
@@ -323,11 +323,24 @@ public partial class MainWindow : Window
     {
         try
         {
+            // Temel ayarları doğrula
+            if (string.IsNullOrWhiteSpace(txtVncPath.Text) || !File.Exists(txtVncPath.Text))
+            {
+                MessageBox.Show("Lütfen geçerli bir TightVNC yolu seçin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!int.TryParse(txtVncPort.Text, out int port) || port < 1 || port > 65535)
+            {
+                MessageBox.Show("Lütfen geçerli bir port numarası girin (1-65535).", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var settings = new AppSettings
             {
                 VncPath = txtVncPath.Text,
-                StartWithWindows = chkStartWithWindows.IsChecked ?? false,
-                VncPort = int.TryParse(txtVncPort.Text, out int port) ? port : 5900
+                VncPort = port,
+                StartWithWindows = chkStartWithWindows.IsChecked ?? false
             };
             
             // Ayarları kaydet
@@ -346,18 +359,10 @@ public partial class MainWindow : Window
             // Bağımlılık kontrolü
             CheckDependencies();
 
-            // Ek kontrol: TightVNC yolu geçerli değilse Ayarlar sekmesine yönlendir
-            if (!_vncLauncherService.IsVncPathValid(settings.VncPath))
-            {
-                MainTabControl.SelectedIndex = 2; // Ayarlar sekmesi
-            }
             // Başarılı mesajı göster
-            else
-            {
-                var successDialog = new VNCLauncher.Views.DeleteSuccessDialog("Ayarlar Kaydedildi", "Ayarlar başarıyla kaydedildi.");
-                successDialog.Owner = this;
-                successDialog.ShowDialog();
-            }
+            var successDialog = new VNCLauncher.Views.DeleteSuccessDialog("Ayarlar Kaydedildi", "Ayarlar başarıyla kaydedildi.");
+            successDialog.Owner = this;
+            successDialog.ShowDialog();
         }
         catch (Exception ex)
         {
@@ -394,30 +399,29 @@ public partial class MainWindow : Window
     
     private void CheckDependencies()
     {
-        // TightVNC kontrolü
-        bool isVncPathValid = _vncLauncherService.IsVncPathValid(txtVncPath.Text);
-        bool isVncInstalled = _vncLauncherService.IsVncInstalled();
-        
-        if (isVncPathValid)
+        if (!_vncLauncherService.IsVncInstalled())
         {
-            txtDependencyStatus.Text = "TightVNC Viewer bulundu ve kullanıma hazır.";
-            btnInstallVnc.Visibility = Visibility.Collapsed;
-        }
-        else if (isVncInstalled)
-        {
-            txtDependencyStatus.Text = "TightVNC Viewer yüklü ancak belirtilen yolda bulunamadı. Lütfen ayarlardan doğru yolu belirtin.";
-            btnInstallVnc.Visibility = Visibility.Collapsed;
+            txtDependencyStatus.Text = "TightVNC yüklü değil";
+            btnInstallVnc.Visibility = Visibility.Visible;
         }
         else
         {
-            txtDependencyStatus.Text = "TightVNC Viewer bulunamadı. Bu uygulama TightVNC Viewer'a bağımlıdır. Lütfen TightVNC'yi yükleyin.";
-            btnInstallVnc.Visibility = Visibility.Visible;
+            txtDependencyStatus.Text = "TightVNC yüklü";
+            btnInstallVnc.Visibility = Visibility.Collapsed;
         }
-        
-        // .NET Runtime kontrolü - uygulama çalışıyorsa zaten yüklü demektir
-        txtDependencyStatus.Text += "\n\n.NET 8.0 Runtime yüklü ve çalışıyor.";
+
+        // .NET Runtime kontrolü
+        try
+        {
+            var dotNetVersion = Environment.Version;
+            txtDotNetStatus.Text = $".NET Runtime {dotNetVersion.Major}.{dotNetVersion.Minor} yüklü";
+        }
+        catch
+        {
+            txtDotNetStatus.Text = ".NET Runtime kontrol edilemedi";
+        }
     }
-    
+
     private void BtnInstallVnc_Click(object sender, RoutedEventArgs e)
     {
         _vncLauncherService.OpenTightVncDownloadPage();
@@ -606,14 +610,22 @@ public partial class MainWindow : Window
         return false; // Geçersiz format (birden fazla tire vb.)
     }
 
+    private SemaphoreSlim _scanSemaphore = new SemaphoreSlim(10, 10); // Varsayılan değerlerle başlat
+    private int _completedScans = 0;
+    private int _foundCount = 0;
+    private int _totalIpsToScan = 0;
+    private DateTime _scanStartTime;
+
     private async void BtnScanNetwork_Click(object sender, RoutedEventArgs e)
     {
         if (_isScanning)
         {
             _scanCancellationTokenSource?.Cancel();
-            // Durdurma işlemleri (isScanning = false, buton metni vs.) try-finally bloğunda yapılacak
             return;
         }
+
+        var settings = await _jsonDataService.LoadSettingsAsync();
+        _scanSemaphore = new SemaphoreSlim(settings.MaxConcurrentScans, settings.MaxConcurrentScans);
 
         if (!TryParseIpRange(txtIpRange.Text, out IPAddress? startIpAddr, out IPAddress? endIpAddr) || startIpAddr == null || endIpAddr == null)
         {
@@ -629,61 +641,97 @@ public partial class MainWindow : Window
         }
 
         _scanResults.Clear();
+        _completedScans = 0;
+        _foundCount = 0;
+        _scanStartTime = DateTime.Now;
+        
         txtScanStatus.Text = "Tarama başlatılıyor...";
         scanProgressBar.Visibility = Visibility.Visible;
         scanProgressBar.Value = 0;
         btnScanNetwork.Content = "Durdur";
         _isScanning = true;
         _scanCancellationTokenSource = new CancellationTokenSource();
-        CancellationToken token = _scanCancellationTokenSource.Token;
+        var token = _scanCancellationTokenSource.Token;
 
         List<IPAddress> ipAddressesToScan = GetIpRange(startIpAddr, endIpAddr);
-        if (!ipAddressesToScan.Any())
+        _totalIpsToScan = ipAddressesToScan.Count;
+        
+        if (_totalIpsToScan == 0)
         {
             txtScanStatus.Text = "Belirtilen aralıkta taranacak IP adresi bulunamadı.";
-             _isScanning = false;
+            _isScanning = false;
             btnScanNetwork.Content = "Ağı Tara";
             scanProgressBar.Visibility = Visibility.Collapsed;
             return;
         }
-        scanProgressBar.Maximum = ipAddressesToScan.Count;
+        
+        scanProgressBar.Maximum = _totalIpsToScan;
+        var scanTasks = new List<Task>();
 
-        int foundCount = 0;
         try
         {
-            for (int i = 0; i < ipAddressesToScan.Count; i++)
+            foreach (var ip in ipAddressesToScan)
             {
                 token.ThrowIfCancellationRequested();
-                IPAddress currentIp = ipAddressesToScan[i];
-                txtScanStatus.Text = $"Taranıyor: {currentIp} ({i + 1}/{ipAddressesToScan.Count})";
-                scanProgressBar.Value = i + 1;
-
-                bool isReachable = await IsHostReachableAsync(currentIp.ToString(), token);
-                if (isReachable)
+                await _scanSemaphore.WaitAsync(token);
+                
+                var task = Task.Run(async () =>
                 {
-                    token.ThrowIfCancellationRequested();
-                    bool isVncOpen = await IsVncPortOpenAsync(currentIp.ToString(), 5900, 500, token);
-                    token.ThrowIfCancellationRequested();
-                    string hostname = await GetHostnameAsync(currentIp.ToString(), token);
-                    
-                    if (isVncOpen)
+                    try
                     {
-                        _scanResults.Add(new ScanResult { IpAddress = currentIp.ToString(), Hostname = hostname, IsVncPortOpen = isVncOpen });
-                        foundCount++;
+                        await ScanSingleIpAsync(ip, token);
                     }
+                    finally
+                    {
+                        _scanSemaphore.Release();
+                        int completed = Interlocked.Increment(ref _completedScans);
+                        
+                        // UI güncellemeleri ana thread'de yapılmalı
+                        Dispatcher.Invoke(() =>
+                        {
+                            scanProgressBar.Value = completed;
+                            var elapsed = DateTime.Now - _scanStartTime;
+                            var remaining = TimeSpan.FromTicks(
+                                elapsed.Ticks * (_totalIpsToScan - completed) / Math.Max(1, completed));
+                            
+                            int percentage = _totalIpsToScan > 0 ? (completed * 100 / _totalIpsToScan) : 0;
+                            string remainingTime = $"{remaining.Minutes:00}:{remaining.Seconds:00}";
+                            txtScanStatus.Text = $"Taranıyor: {completed}/{_totalIpsToScan} " +
+                                              $"({percentage}%) | " +
+                                              $"Bulunan: {_foundCount} | " +
+                                              $"Kalan süre: {remainingTime}";
+                        });
+                    }
+                }, token);
+                
+                scanTasks.Add(task);
+                
+                // Başlangıçta tüm görevleri hızlıca başlatmak için küçük bir gecikme
+                if (scanTasks.Count < settings.MaxConcurrentScans * 2)
+                {
+                    await Task.Delay(10, token);
                 }
-                 if (i % 10 == 0) 
-                    await Task.Delay(1, token);
             }
-            txtScanStatus.Text = $"Tarama tamamlandı. {foundCount} cihaz bulundu.";
+
+            await Task.WhenAll(scanTasks);
+            
+            if (!token.IsCancellationRequested)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    TimeSpan duration = DateTime.Now - _scanStartTime;
+                    txtScanStatus.Text = $"Tarama tamamlandı. {_foundCount} cihaz bulundu. " +
+                                      $"Süre: {duration.Hours:00}:{duration.Minutes:00}:{duration.Seconds:00}";
+                });
+            }
         }
         catch (OperationCanceledException)
         {
-            txtScanStatus.Text = "Tarama kullanıcı tarafından iptal edildi.";
+            Dispatcher.Invoke(() => txtScanStatus.Text = "Tarama kullanıcı tarafından iptal edildi.");
         }
         catch (Exception ex)
         {
-            txtScanStatus.Text = $"Tarama sırasında bir hata oluştu: {ex.Message}";
+            Dispatcher.Invoke(() => txtScanStatus.Text = $"Tarama sırasında bir hata oluştu: {ex.Message}");
         }
         finally
         {
@@ -718,48 +766,66 @@ public partial class MainWindow : Window
         return list;
     }
 
-    private async Task<bool> IsHostReachableAsync(string ipAddress, CancellationToken token, int timeout = 1000)
+    private async Task<bool> IsHostReachableAsync(string ipAddress, int timeoutMs, CancellationToken token)
     {
         if (token.IsCancellationRequested) return false;
         try
         {
             using (var ping = new Ping())
             {
-                // Ping.SendPingAsync CancellationToken kabul etmiyor, bu yüzden manuel kontrol
-                var pingTask = ping.SendPingAsync(ipAddress, timeout);
-                await Task.WhenAny(pingTask, Task.Delay(timeout + 100, token)); // Ping timeout'undan biraz fazla bekle
+                var pingTask = ping.SendPingAsync(ipAddress, timeoutMs);
+                await Task.WhenAny(pingTask, Task.Delay(timeoutMs + 100, token));
                 token.ThrowIfCancellationRequested();
                 return pingTask.IsCompletedSuccessfully && pingTask.Result.Status == IPStatus.Success;
             }
         }
-        catch (OperationCanceledException) { return false; } // Token iptali
-        catch { return false; } // Diğer ping hataları
+        catch (OperationCanceledException) { return false; }
+        catch { return false; }
     }
 
-    private async Task<bool> IsVncPortOpenAsync(string ipAddress, int port = 5900, int timeout = 500, CancellationToken token = default)
+    private async Task<bool> IsVncPortOpenAsync(string ipAddress, int port, int timeoutMs, CancellationToken token)
     {
         if (token.IsCancellationRequested) return false;
         try
         {
             using (var client = new TcpClient())
+            using (var cts = new CancellationTokenSource(timeoutMs))
+            using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token))
             {
-                var connectTask = client.ConnectAsync(ipAddress, port);
-                var timeoutTask = Task.Delay(timeout, token);
-                
-                var completedTask = await Task.WhenAny(connectTask, timeoutTask);
-
-                if (token.IsCancellationRequested) return false;
-
-                if (completedTask == connectTask && connectTask.IsCompletedSuccessfully)
-                {
-                    return true; // Bağlantı başarılı
-                }
-                return false; // Timeout veya bağlantı hatası
+                await client.ConnectAsync(ipAddress, port, linkedCts.Token);
+                return client.Connected;
             }
         }
-        catch (OperationCanceledException) { return false; } // Token iptali
-        catch (SocketException) { return false; } // Port kapalı veya host bulunamadı
-        catch { return false; } // Diğer hatalar
+        catch (OperationCanceledException) { return false; }
+        catch (SocketException) { return false; }
+        catch { return false; }
+    }
+
+    private async Task ScanSingleIpAsync(IPAddress ip, CancellationToken token)
+    {
+        var settings = await _jsonDataService.LoadSettingsAsync();
+        string ipString = ip.ToString();
+        bool isReachable = settings.SkipPingScan || await IsHostReachableAsync(ipString, settings.PingTimeoutMs, token);
+        if (isReachable)
+        {
+            token.ThrowIfCancellationRequested();
+            bool isVncOpen = await IsVncPortOpenAsync(ipString, settings.VncPort, settings.PortCheckTimeoutMs, token);
+            if (isVncOpen)
+            {
+                token.ThrowIfCancellationRequested();
+                string hostname = await GetHostnameAsync(ipString, token);
+                Dispatcher.Invoke(() =>
+                {
+                    _scanResults.Add(new ScanResult
+                    {
+                        IpAddress = ipString,
+                        Hostname = hostname,
+                        IsVncPortOpen = true
+                    });
+                });
+                Interlocked.Increment(ref _foundCount);
+            }
+        }
     }
 
     private async Task<string> GetHostnameAsync(string ipAddress, CancellationToken token)
@@ -767,48 +833,68 @@ public partial class MainWindow : Window
         if (token.IsCancellationRequested) return "N/A";
         try
         {
-            // Dns.GetHostEntryAsync CancellationToken kabul etmiyor.
-            // Bu nedenle, bu işlemi kısa bir zaman aşımıyla sarmak veya doğrudan çağırmak gerekebilir.
-            // Şimdilik doğrudan çağırıyoruz, ancak uzun sürebilir.
+            var settings = await _jsonDataService.LoadSettingsAsync();
             var hostEntryTask = Dns.GetHostEntryAsync(ipAddress);
-            await Task.WhenAny(hostEntryTask, Task.Delay(1000, token)); // 1 saniye timeout
+            await Task.WhenAny(hostEntryTask, Task.Delay(settings.PingTimeoutMs, token));
             token.ThrowIfCancellationRequested();
 
             if (hostEntryTask.IsCompletedSuccessfully)
             {
-                 return hostEntryTask.Result.HostName;
+                return hostEntryTask.Result.HostName;
             }
             return "N/A";
         }
         catch (OperationCanceledException) { return "N/A"; }
-        catch (SocketException) { return "N/A"; } // Hostname çözümlenemedi
-        catch { return "N/A"; } // Diğer hatalar
+        catch (SocketException) { return "N/A"; }
+        catch { return "N/A"; }
     }
 
     private void HeaderCheckBox_Checked(object sender, RoutedEventArgs e)
     {
-        foreach (var item in _scanResults)
+        if (_scanResults != null)
         {
-            item.IsSelected = true;
+            foreach (var item in _scanResults)
+            {
+                item.IsSelected = true;
+            }
+            UpdateSelectedCount();
         }
-        //dgScanResults.Items.Refresh(); // INotifyPropertyChanged ile otomatik güncellenmeli
+    }
+
+    public void UpdateSelectedCount()
+    {
+        if (txtSelectedCount == null || btnAddSelectedToAddressBook == null) return;
+        
+        int selectedCount = _scanResults?.Count(r => r.IsSelected) ?? 0;
+        txtSelectedCount.Text = $"{selectedCount} öğe seçildi";
+        btnAddSelectedToAddressBook.Visibility = selectedCount > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void HeaderCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
-        foreach (var item in _scanResults)
+        if (_scanResults != null)
         {
-            item.IsSelected = false;
+            foreach (var item in _scanResults)
+            {
+                item.IsSelected = false;
+            }
+            UpdateSelectedCount();
         }
-        //dgScanResults.Items.Refresh(); // INotifyPropertyChanged ile otomatik güncellenmeli
     }
 
     private async void BtnAddSelectedToAddressBook_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItems = _scanResults.Where(r => r.IsSelected).ToList();
-        if (!selectedItems.Any())
+        await AddSelectedToAddressBookAsync();
+    }
+
+    public async Task AddSelectedToAddressBookAsync()
+    {
+        var selectedItems = _scanResults?.Where(r => r.IsSelected).ToList();
+        if (selectedItems == null || !selectedItems.Any())
         {
-            MessageBox.Show("Lütfen adres defterine eklemek için en az bir cihaz seçin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+            var warningDialog = new DeleteSuccessDialog("Uyarı", "Lütfen adres defterine eklemek için en az bir cihaz seçin.");
+            warningDialog.Owner = this;
+            warningDialog.ShowDialog();
             return;
         }
 
@@ -844,11 +930,250 @@ public partial class MainWindow : Window
         {
             message += $"\n{duplicateCount} cihaz zaten mevcut olduğu için eklenmedi.";
         }
-        MessageBox.Show(message, "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+        var successDialog = new DeleteSuccessDialog("Bilgi", message);
+        successDialog.Owner = this;
+        successDialog.ShowDialog();
 
         foreach (var item in selectedItems) { item.IsSelected = false; } // Seçimi temizle
-        if(headerCheckBox != null) headerCheckBox.IsChecked = false; // Ana checkbox'ı da temizle
         // dgScanResults.Items.Refresh(); // INotifyPropertyChanged ile otomatik güncellenmeli
+    }
+
+    #endregion
+
+    #region ContextMenu Handlers
+
+    public async Task ConnectToVnc(string ipAddress)
+    {
+        if (string.IsNullOrEmpty(ipAddress)) return;
+
+        try
+        {
+            await _vncLauncherService.LaunchVncConnectionAsync(new VncConnection
+            {
+                IpAddress = ipAddress,
+                Name = ipAddress
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"VNC bağlantısı başlatılamadı: {ex.Message}", "Hata", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    public async void ConnectToSelectedVnc()
+    {
+        if (dgScanResults?.SelectedItem is ScanResult selected)
+        {
+            await ConnectToVnc(selected.IpAddress);
+        }
+    }
+
+    public void CopySelectedIp()
+    {
+        if (dgScanResults?.SelectedItem is ScanResult selected)
+        {
+            Clipboard.SetText(selected.IpAddress);
+        }
+    }
+
+    public void CopySelectedHostname()
+    {
+        if (dgScanResults?.SelectedItem is ScanResult selected)
+        {
+            Clipboard.SetText(selected.Hostname ?? "N/A");
+        }
+    }
+
+    public void CopyAllSelectedInfo()
+    {
+        if (dgScanResults?.SelectedItem is ScanResult selected)
+        {
+            string info = $"IP: {selected.IpAddress}\r\nHostname: {selected.Hostname ?? "N/A"}";
+            Clipboard.SetText(info);
+        }
+    }
+
+    public void ClearSelection()
+    {
+        if (dgScanResults != null)
+        {
+            dgScanResults.UnselectAll();
+            
+            if (_scanResults != null)
+            {
+                foreach (var item in _scanResults)
+                {
+                    item.IsSelected = false;
+                }
+            }
+            
+            UpdateSelectedCount();
+        }
+    }
+
+    private void ContextMenuVncConnect_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgScanResults.SelectedItem is ScanResult selectedItem)
+        {
+            var connection = new VncConnection
+            {
+                Name = string.IsNullOrWhiteSpace(selectedItem.Hostname) || selectedItem.Hostname == "N/A" 
+                    ? selectedItem.IpAddress 
+                    : selectedItem.Hostname,
+                IpAddress = selectedItem.IpAddress
+            };
+            _ = _vncLauncherService.LaunchVncConnectionAsync(connection);
+        }
+    }
+
+    private void ContextMenuCopyIp_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgScanResults.SelectedItem is ScanResult selectedItem)
+        {
+            Clipboard.SetText(selectedItem.IpAddress);
+        }
+    }
+
+    private void ContextMenuCopyHostname_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgScanResults.SelectedItem is ScanResult selectedItem && 
+            !string.IsNullOrWhiteSpace(selectedItem.Hostname) && 
+            selectedItem.Hostname != "N/A")
+        {
+            Clipboard.SetText(selectedItem.Hostname);
+        }
+    }
+
+    private void ContextMenuCopyAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgScanResults.SelectedItem is ScanResult selectedItem)
+        {
+            string text = $"IP: {selectedItem.IpAddress}\r\n" +
+                         $"Hostname: {selectedItem.Hostname}";
+            Clipboard.SetText(text);
+        }
+    }
+
+    private async void ContextMenuAddToAddressBook_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgScanResults.SelectedItem is ScanResult selectedItem)
+        {
+            if (_connections.Any(c => c.IpAddress.Equals(selectedItem.IpAddress, StringComparison.OrdinalIgnoreCase)))
+            {
+                var warningDialog = new DeleteSuccessDialog("Uyarı", "Bu IP adresi zaten adres defterinizde mevcut.");
+                warningDialog.Owner = this;
+                warningDialog.ShowDialog();
+                return;
+            }
+
+            var newConnection = new VncConnection
+            {
+                Name = string.IsNullOrWhiteSpace(selectedItem.Hostname) || selectedItem.Hostname == "N/A" 
+                    ? selectedItem.IpAddress 
+                    : selectedItem.Hostname,
+                IpAddress = selectedItem.IpAddress,
+                CreatedDate = DateTime.Now,
+                IsAvailable = await _connectionCheckService.IsHostReachableAsync(selectedItem.IpAddress)
+            };
+
+            _connections.Add(newConnection);
+            await SaveConnectionsAsync();
+
+            var successDialog = new DeleteSuccessDialog("Başarılı", "Cihaz adres defterinize eklendi.");
+            successDialog.Owner = this;
+            successDialog.ShowDialog();
+        }
+    }
+
+    private void ContextMenuClearSelection_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgScanResults.SelectedItem is ScanResult selectedItem)
+        {
+            selectedItem.IsSelected = false;
+        }
+    }
+
+    private void ContextMenuCopy_Click(object sender, RoutedEventArgs e)
+    {
+        // Ana menü tıklandığında bir şey yapma, alt menüler işleyecek
+    }
+
+    private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+    {
+        if (sender is ContextMenu menu && menu.PlacementTarget is DataGrid dataGrid)
+        {
+            var selectedItem = dataGrid.SelectedItem as ScanResult;
+            bool hasSelection = selectedItem != null;
+
+            foreach (var item in menu.Items.OfType<MenuItem>())
+            {
+                // Tüm menü öğelerini etkinleştir/devre dışı bırak
+                item.IsEnabled = hasSelection;
+                
+                // Alt menüleri de işle
+                foreach (var subItem in item.Items.OfType<MenuItem>())
+                {
+                    subItem.IsEnabled = hasSelection;
+                }
+            }
+        }
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyboardDevice.Modifiers == ModifierKeys.None)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    if (dgScanResults.SelectedItem is ScanResult selectedItem && tabControl.SelectedItem == tabScan)
+                    {
+                        ContextMenuVncConnect_Click(sender, e);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Escape:
+                    ContextMenuClearSelection_Click(sender, e);
+                    e.Handled = true;
+                    break;
+            }
+        }
+        else if (e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+        {
+            switch (e.Key)
+            {
+                case Key.C:
+                    ContextMenuCopyAll_Click(sender, e);
+                    e.Handled = true;
+                    break;
+                case Key.D:
+                    if (tabControl.SelectedItem == tabScan)
+                    {
+                        ContextMenuAddToAddressBook_Click(sender, e);
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+        else if (e.KeyboardDevice.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            switch (e.Key)
+            {
+                case Key.I:
+                    ContextMenuCopyIp_Click(sender, e);
+                    e.Handled = true;
+                    break;
+                case Key.H:
+                    ContextMenuCopyHostname_Click(sender, e);
+                    e.Handled = true;
+                    break;
+                case Key.A:
+                    ContextMenuCopyAll_Click(sender, e);
+                    e.Handled = true;
+                    break;
+            }
+        }
     }
 
     #endregion
@@ -887,6 +1212,47 @@ public partial class MainWindow : Window
             await SaveConnectionsAsync();
             // Görünümü yenilemek için sıralamayı yeniden uygula
             _connectionsView?.Refresh(); 
+        }
+    }
+
+    private void CmbConnectionFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _connectionsView?.Refresh();
+    }
+
+    private void TxtIpAddress_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        // Sadece rakam ve nokta
+        e.Handled = !Regex.IsMatch(e.Text, "[0-9]");
+    }
+
+    private void TxtIpAddress_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            string text = textBox.Text;
+            int caret = textBox.CaretIndex;
+            string newText = text;
+            int dots = text.Count(c => c == '.');
+            // Otomatik nokta ekle
+            if (text.Length > 0 && text.Length <= 15)
+            {
+                string[] parts = text.Split('.');
+                if (parts.Length < 4)
+                {
+                    string digits = text.Replace(".", "");
+                    if (digits.Length > 3 * (parts.Length - 1))
+                    {
+                        newText = string.Join(".", Regex.Matches(digits, ".{1,3}").Select(m => m.Value));
+                        if (newText.Length > text.Length) caret++;
+                    }
+                }
+            }
+            if (newText != text)
+            {
+                textBox.Text = newText;
+                textBox.CaretIndex = caret;
+            }
         }
     }
 }
